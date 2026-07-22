@@ -17,7 +17,7 @@
   --good-soft: #e9f6ef;
   --warn: #b25e0b;
   --warn-soft: #fbf1e4;
-  --font-sans: "Instrument Sans", system-ui, sans-serif;
+  --font-sans: "Basic", system-ui, sans-serif;
   --font-mono: "Spline Sans Mono", ui-monospace, monospace;
   --r-card: 14px;
   --r-el: 8px;
@@ -149,13 +149,10 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 14px;
   color: var(--ink-2);
-  padding: 7px 13px;
+  padding: 6px 13px;
   border-radius: var(--r-el);
   background: var(--surface);
   border: 1px solid var(--line);
@@ -180,15 +177,12 @@ button {
   }
 }
 .top__badge {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 14px;
   color: var(--warn);
   background: var(--warn-soft);
   border-radius: var(--r-el);
-  padding: 7px 13px;
+  padding: 6px 13px;
 }
 
 /* ── sections ────────────────────────────────────── */
@@ -583,8 +577,8 @@ button {
   display: flex;
   align-items: center;
   gap: 11px;
-  font-family: var(--font-mono);
-  font-size: 13px;
+  font-family: var(--font-sans);
+  font-size: 15px;
   color: var(--ink-3);
   transition: color 0.3s;
 }
@@ -651,8 +645,8 @@ button {
 }
 .lattice__cap {
   grid-column: 1 / -1;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
   color: var(--ink-3);
   white-space: nowrap;
 }
@@ -704,9 +698,8 @@ button {
   }
 }
 .pload__gridLabel {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
   color: var(--ink-3);
   white-space: nowrap;
 }
@@ -716,8 +709,8 @@ button {
   gap: 6px;
 }
 .hnode {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-family: var(--font-sans);
+  font-size: 13px;
   text-align: center;
   color: var(--ink-3);
   border: 1px solid var(--line);
@@ -814,13 +807,10 @@ button {
   font-size: 17px;
 }
 .rrow__tag {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
   border-radius: 6px;
-  padding: 3px 9px;
+  padding: 3px 10px;
 }
 .rrow__tag--in {
   color: var(--good);
@@ -832,15 +822,12 @@ button {
 }
 .rrow__badge {
   margin-left: auto;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
   color: var(--ink-3);
   background: var(--bg);
   border-radius: 6px;
-  padding: 3px 9px;
+  padding: 3px 10px;
 }
 
 /* ranked view */
@@ -1262,7 +1249,7 @@ button {
 /* ════════ console app ════════ */
 
 :root {
-  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-serif: "Noto Serif Display", Georgia, serif;
 }
 
 /* entry gate */
@@ -1382,10 +1369,8 @@ button {
   letter-spacing: 0.02em;
 }
 .bar__brand span {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 14px;
   color: var(--ink-3);
 }
 .bar__right {
@@ -1523,9 +1508,9 @@ button {
   padding-top: 14px;
 }
 .about summary {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-3);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  color: var(--ink-2);
   cursor: pointer;
 }
 .about__body {
