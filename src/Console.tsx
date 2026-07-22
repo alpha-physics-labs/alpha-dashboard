@@ -1036,6 +1036,23 @@ export default function Console() {
 
               <section className="detail__sec">
                 <h3>Known data, Materials Project</h3>
+                {(() => {
+                  const k = known[sel.formula];
+                  if (k && k !== "loading" && k !== "none" && k.polymorphs > 1) {
+                    return (
+                      <p className="polywarn">
+                        <b>Same formula, {k.polymorphs} different crystals.</b> A chemical formula
+                        does not say which arrangement of atoms you have, and different
+                        arrangements of the same composition can differ substantially in
+                        stiffness. Our prediction is a composition-level estimate across them,
+                        and our confidence range does not cover that spread. Reading the crystal
+                        structure rather than only the formula is the next model we intend to
+                        build.
+                      </p>
+                    );
+                  }
+                  return null;
+                })()}
                 <div className="pgrid">
                   {(() => {
                     const k = known[sel.formula];
@@ -1060,7 +1077,12 @@ export default function Console() {
                         <Cell
                           name="Known structures"
                           value={k.polymorphs}
-                          caption="Crystal forms of this composition in the database"
+                          caption={
+                            k.polymorphs > 1
+                              ? `${k.polymorphs} different crystal forms of this same composition. They can have genuinely different properties.`
+                              : "Crystal forms of this composition in the database"
+                          }
+                          tone={k.polymorphs > 1 ? "warn" : undefined}
                         />
                         {k.stable?.crystal_system && (
                           <Cell

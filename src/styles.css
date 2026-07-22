@@ -831,6 +831,18 @@ button {
   color: #fff;
   background: #b3261e;
 }
+.polywarn {
+  margin: 16px 20px 0;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: var(--warn-soft);
+  color: #7a4408;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.polywarn b {
+  color: #5e3406;
+}
 .detail__reduced {
   margin-top: 12px;
   padding: 10px 13px;
