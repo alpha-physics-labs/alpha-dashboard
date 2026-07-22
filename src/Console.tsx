@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import Roadmap from "./Roadmap";
 import {
   API_BASE,
   checkHealth,
@@ -519,6 +520,7 @@ export default function Console() {
   const [known, setKnown] = useState<Record<string, KnownState>>({});
   const [status, setStatus] = useState<"checking" | "online" | "offline">("checking");
   const [card, setCard] = useState<ModelCard | null>(null);
+  const [tab, setTab] = useState<"console" | "roadmap">("console");
 
   useEffect(() => {
     let tries = 0;
@@ -617,7 +619,20 @@ export default function Console() {
         <div className="bar__brand">
           <img src={`${import.meta.env.BASE_URL}logo.png`} alt="" />
           <b>ALPHA</b>
-          <span>Console</span>
+          <nav className="bar__tabs">
+            <button
+              className={tab === "console" ? "bar__tab is-on" : "bar__tab"}
+              onClick={() => setTab("console")}
+            >
+              Console
+            </button>
+            <button
+              className={tab === "roadmap" ? "bar__tab is-on" : "bar__tab"}
+              onClick={() => setTab("roadmap")}
+            >
+              Roadmap
+            </button>
+          </nav>
         </div>
         <div className="bar__right">
           <span className={`status status--${status}`}>
@@ -629,7 +644,9 @@ export default function Console() {
         </div>
       </header>
 
-      <div className="work">
+      {tab === "roadmap" && <Roadmap />}
+
+      <div className="work" hidden={tab !== "console"}>
         {/* left: input + list */}
         <aside className="side">
           <form
