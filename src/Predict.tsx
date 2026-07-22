@@ -232,22 +232,31 @@ export default function Predict() {
                   </span>
                   <span className="result__val">
                     {r.shear_modulus_gpa}
-                    <em> GPa · test MAE {r.uncertainty_gpa}</em>
+                    <em> GPa · 90% ± {r.shear_conformal90_gpa ?? r.uncertainty_gpa}</em>
                   </span>
                   <span className="result__badge">{r.evidence_status ?? "SCREENING_ONLY"}</span>
                 </div>
                 <div className="result__props">
+                  {r.domain && (
+                    <span
+                      className={`prop prop--tag ${
+                        r.domain === "in_domain" ? "prop--ductile" : "prop--brittle"
+                      }`}
+                    >
+                      <b>{r.domain === "in_domain" ? "in domain" : "extrapolating"}</b>
+                    </span>
+                  )}
                   <span className="prop">
                     <label>shear G</label>
                     <b>
-                      {r.shear_modulus_gpa} <i>GPa · ±{r.uncertainty_gpa}</i>
+                      {r.shear_modulus_gpa} <i>GPa · ±{r.shear_conformal90_gpa ?? r.uncertainty_gpa}</i>
                     </b>
                   </span>
                   {r.bulk_modulus_gpa != null && (
                     <span className="prop">
                       <label>bulk K</label>
                       <b>
-                        {r.bulk_modulus_gpa} <i>GPa · ±{r.bulk_uncertainty_gpa}</i>
+                        {r.bulk_modulus_gpa} <i>GPa · ±{r.bulk_conformal90_gpa ?? r.bulk_uncertainty_gpa}</i>
                       </b>
                     </span>
                   )}
@@ -277,7 +286,7 @@ export default function Predict() {
                     <span className="prop">
                       <label>band gap</label>
                       <b>
-                        {r.band_gap_ev} <i>eV · ±{r.band_gap_uncertainty_ev}</i>
+                        {r.band_gap_ev} <i>eV · ±{r.band_gap_conformal90_ev ?? r.band_gap_uncertainty_ev}</i>
                       </b>
                     </span>
                   )}
@@ -297,6 +306,62 @@ export default function Predict() {
                     </span>
                   )}
                 </div>
+                {(r.density_est_gcc != null || r.acoustic_impedance_mrayl != null) && (
+                  <div className="result__props result__props--impact">
+                    {r.density_est_gcc != null && (
+                      <span className="prop">
+                        <label>ρ est.</label>
+                        <b>
+                          {r.density_est_gcc} <i>g/cm³</i>
+                        </b>
+                      </span>
+                    )}
+                    {r.specific_stiffness_gpa_gcc != null && (
+                      <span className="prop">
+                        <label>E/ρ</label>
+                        <b>
+                          {r.specific_stiffness_gpa_gcc} <i>GPa·cm³/g</i>
+                        </b>
+                      </span>
+                    )}
+                    {r.sound_speed_shear_ms != null && (
+                      <span className="prop">
+                        <label>shear wave vₛ</label>
+                        <b>
+                          {r.sound_speed_shear_ms.toLocaleString()} <i>m/s</i>
+                        </b>
+                      </span>
+                    )}
+                    {r.acoustic_impedance_mrayl != null && (
+                      <span className="prop">
+                        <label>impedance Z</label>
+                        <b>
+                          {r.acoustic_impedance_mrayl} <i>MRayl</i>
+                        </b>
+                      </span>
+                    )}
+                    {r.kmin_clarke_w_mk != null && (
+                      <span className="prop">
+                        <label>κ min (Clarke)</label>
+                        <b>
+                          {r.kmin_clarke_w_mk} <i>W/m·K</i>
+                        </b>
+                      </span>
+                    )}
+                  </div>
+                )}
+                {r.neighbors && r.neighbors.length > 0 && (
+                  <p className="result__nbrs">
+                    nearest training materials:{" "}
+                    {r.neighbors.map((n, i) => (
+                      <span key={n.formula + i}>
+                        {i > 0 && " · "}
+                        <code>{n.formula}</code> {n.shear_modulus_gpa} GPa
+                      </span>
+                    ))}{" "}
+                    <em>(measured)</em>
+                  </p>
+                )}
               </li>
             );
           })}
@@ -312,10 +377,11 @@ export default function Predict() {
       {!loading && valid.length > 0 && (
         <p className="predict__note">
           Composition-only estimates, ranked by shear modulus — a formula does not specify
-          crystal phase, microstructure, or processing. The ± values are each head's held-out
-          test MAE, not material-specific intervals. Hardness is the Chen–Niu intrinsic
-          estimate, not an indentation test; the Pugh tag is a brittleness-tendency indicator,
-          not a measured failure mode.
+          crystal phase, microstructure, or processing. The ± values are split-conformal 90%
+          intervals: calibrated so 90% of held-out materials land inside, and verified at
+          90–91% coverage on the test set. Hardness is the Chen–Niu intrinsic estimate, not an
+          indentation test; the Pugh tag is a brittleness-tendency indicator; density and the
+          impact row are physics-derived from element data and the predicted moduli.
         </p>
       )}
     </div>

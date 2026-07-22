@@ -161,6 +161,13 @@ export default function App() {
             The prior under the hood:&nbsp;<code>{PHYSICS_LAW}</code>&nbsp;— cohesive density does
             the heavy lifting; the network learns only the residual, constrained to obey it.
           </p>
+          <p className="law">
+            Out-of-distribution honesty — remove an entire chemical family from training and
+            predict it cold (shear, MAE): all&nbsp;borides <b>32.5</b>, all&nbsp;tungsten
+            compounds <b>17.8</b>, all&nbsp;zirconium compounds <b>11.5</b> vs <b>9.3</b> GPa
+            in-domain. Truly novel chemistry is harder — which is why every prediction carries
+            an in-domain / extrapolating flag.
+          </p>
         </section>
 
         <section className="sec" style={{ animationDelay: "240ms" }}>
@@ -225,8 +232,9 @@ export default function App() {
             <div>
               <dt>Uncertainty basis</dt>
               <dd>
-                The ± on each value is that head's global held-out test MAE. Material-specific
-                intervals are not yet calibrated.
+                Split-conformal 90% intervals per head — G ±23.0 GPa, K ±30.3 GPa, gap ±1.21 eV —
+                calibrated on a held-out calibration set and verified on the untouched test set
+                (measured coverage 90.1–91.0%). Test MAE is reported alongside.
               </dd>
             </div>
             <div>

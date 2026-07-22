@@ -25,6 +25,17 @@ export type Prediction = {
   band_gap_ev?: number;
   band_gap_uncertainty_ev?: number;
   electronic_class?: "metallic" | "semiconductor" | "insulator";
+  shear_conformal90_gpa?: number;
+  bulk_conformal90_gpa?: number;
+  band_gap_conformal90_ev?: number;
+  domain?: "in_domain" | "extrapolating";
+  neighbors?: { formula: string; shear_modulus_gpa: number }[];
+  density_est_gcc?: number;
+  sound_speed_shear_ms?: number;
+  sound_speed_long_ms?: number;
+  acoustic_impedance_mrayl?: number;
+  specific_stiffness_gpa_gcc?: number;
+  kmin_clarke_w_mk?: number;
   evidence_status?: string;
   note?: string;
 };

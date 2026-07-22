@@ -570,6 +570,30 @@ button {
   text-transform: uppercase;
   color: var(--ink-mute);
 }
+.result__props--impact {
+  margin-top: 8px;
+}
+.result__props--impact .prop {
+  background: rgba(78, 144, 242, 0.045);
+}
+.result__nbrs {
+  margin-top: 10px;
+  padding-left: 60px;
+  font-size: 13px;
+  color: var(--ink-mute);
+}
+.result__nbrs code {
+  color: var(--ink-soft);
+}
+.result__nbrs em {
+  font-style: normal;
+  font-size: 12px;
+}
+@media (max-width: 860px) {
+  .result__nbrs {
+    padding-left: 0;
+  }
+}
 .predict__failed {
   margin-top: 12px;
   color: var(--ink-mute);
