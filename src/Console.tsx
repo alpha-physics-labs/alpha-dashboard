@@ -523,16 +523,28 @@ export default function Console() {
   const [tab, setTab] = useState<"console" | "roadmap">("console");
 
   useEffect(() => {
-    let tries = 0;
+    let stopped = false;
     let timer: ReturnType<typeof setTimeout>;
+    let tries = 0;
+
+    // Never give up: keep retrying while the engine is asleep, then settle into a
+    // slow heartbeat. The heartbeat doubles as a keep-alive, so the free instance
+    // does not spin down while someone has the console open.
     const ping = async () => {
+      if (stopped) return;
       const ok = await checkHealth();
+      if (stopped) return;
       setStatus(ok ? "online" : "offline");
-      if (!ok && tries++ < 20) timer = setTimeout(ping, 15000);
+      const delay = ok ? 600000 : tries++ < 20 ? 15000 : 60000;
+      timer = setTimeout(ping, delay);
     };
+
     ping();
     fetchModelCard().then((c) => c && setCard(c));
-    return () => clearTimeout(timer);
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+    };
   }, []);
 
   const valid = results?.filter((r) => r.shear_modulus_gpa !== null) ?? [];
