@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { predict, type Prediction } from "./api";
+import { API_BASE, predict, type Prediction } from "./api";
 
 const PRESETS = ["WC", "TiB2", "B4C", "SiC", "Al2O3", "Si", "GaAs", "ZrO2"];
 const CLASSICS = "WC TiB2 B4C SiC Al2O3";
@@ -14,11 +14,13 @@ const STEPS = [
   "parsing compositions",
   "computing elemental descriptors",
   "assembling the 132-dimension feature vector",
-  "evaluating trained heads · G, K, band gap",
-  "applying elasticity relations · E, ν, Hᵥ, Pugh",
+  "evaluating trained heads: G, K, band gap",
+  "estimating density from element volumes",
+  "applying elasticity relations: E, ν, hardness",
+  "propagating elastic waves: speeds and shock impedance",
   "classifying electronic character",
 ];
-const STEP_MS = 900;
+const STEP_MS = 1050;
 const MIN_SHOW_MS = STEPS.length * STEP_MS + 400;
 
 const DESCRIPTORS = [
@@ -81,23 +83,26 @@ function PipelineLoading({ formulas }: { formulas: string[] }) {
         </div>
         <ol className="pload__steps">
           {STEPS.map((s, i) => (
-            <li
-              key={s}
-              className={i < step ? "is-done" : i === step ? "is-active" : ""}
-            >
+            <li key={s} className={i < step ? "is-done" : i === step ? "is-active" : ""}>
               <i />
               {s}
-              {i === 1 && i === step && (
-                <em> — {DESCRIPTORS[tick % DESCRIPTORS.length]}</em>
-              )}
+              {i === 1 && i === step && <em> · {DESCRIPTORS[tick % DESCRIPTORS.length]}</em>}
             </li>
           ))}
         </ol>
-        {step >= 4 && (
+        {step >= 5 && (
           <p className="pload__eq">
             E = 9KG / (3K + G) &nbsp;·&nbsp; ν = (3K − 2G) / 2(3K + G) &nbsp;·&nbsp; Hᵥ =
             2(k²G)<sup>0.585</sup> − 3
           </p>
+        )}
+        {step >= 6 && (
+          <div className="lattice" aria-hidden="true">
+            {Array.from({ length: 42 }, (_, i) => (
+              <i key={i} style={{ animationDelay: `${(i % 14) * 110}ms` }} />
+            ))}
+            <span className="lattice__cap">shear wave crossing the lattice · v = √(G/ρ)</span>
+          </div>
         )}
       </div>
       <div className="pload__right">
@@ -128,6 +133,69 @@ function PipelineLoading({ formulas }: { formulas: string[] }) {
   );
 }
 
+/* ── known-structure check (Materials Project) ── */
+
+type Known = {
+  polymorphs: number;
+  stable?: {
+    material_id: string;
+    crystal_system?: string;
+    spacegroup?: string;
+    density_gcc?: number;
+    dft_shear_gpa?: number;
+    dft_bulk_gpa?: number;
+  };
+};
+type KnownState = Known | "loading" | "none";
+
+/* ── views ── */
+
+const VIEWS = [
+  { id: "ranked", label: "Ranked" },
+  { id: "mechanical", label: "Mechanical" },
+  { id: "impact", label: "Impact and thermal" },
+  { id: "electronic", label: "Electronic" },
+  { id: "known", label: "Known data" },
+] as const;
+type ViewId = (typeof VIEWS)[number]["id"];
+
+const VIEW_DEFS: Record<ViewId, string> = {
+  ranked:
+    "Materials ordered by predicted shear modulus, which measures how strongly a material resists changing shape. The line shows the prediction inside its calibrated 90 percent range.",
+  mechanical:
+    "How the material carries load. Trained values show a calibrated 90 percent range. The rest follow from standard elasticity relations.",
+  impact:
+    "Derived from the predicted moduli and element data. These are the numbers impact, armor, and lightweight design teams compare first.",
+  electronic:
+    "Electrical behavior from the band gap head, trained on 4,604 experimentally measured gaps.",
+  known:
+    "A live lookup in the Materials Project, the standard open database of computed crystals. Compare our composition-only estimate with published DFT values for the known structures.",
+};
+
+function Cell({
+  name,
+  value,
+  unit,
+  caption,
+  tone,
+}: {
+  name: string;
+  value: string | number;
+  unit?: string;
+  caption: string;
+  tone?: "good" | "warn" | "accent";
+}) {
+  return (
+    <div className={`cell${tone ? ` cell--${tone}` : ""}${typeof value === "string" ? " cell--tag" : ""}`}>
+      <span className="cell__name">{name}</span>
+      <b className="cell__val">
+        {typeof value === "number" ? value.toLocaleString() : value} {unit && <i>{unit}</i>}
+      </b>
+      <span className="cell__cap">{caption}</span>
+    </div>
+  );
+}
+
 /* ── main panel ── */
 
 export default function Predict() {
@@ -136,6 +204,8 @@ export default function Predict() {
   const [pending, setPending] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<Prediction[] | null>(null);
+  const [view, setView] = useState<ViewId>("ranked");
+  const [known, setKnown] = useState<Record<string, KnownState>>({});
 
   const run = async (raw: string) => {
     const formulas = parse(raw);
@@ -146,13 +216,14 @@ export default function Predict() {
     const started = Date.now();
     try {
       const res = await predict(formulas);
-      // Let the pipeline animation finish its story before the results land.
       const remaining = MIN_SHOW_MS - (Date.now() - started);
       if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
       setResults(res);
+      setKnown({});
+      setView("ranked");
     } catch {
       setError(
-        "Couldn't reach the engine. The free-tier API sleeps when idle — give it ~40 seconds to wake, then try again.",
+        "The engine could not be reached. The free tier sleeps when idle. Give it about 40 seconds to wake, then try again.",
       );
     } finally {
       setLoading(false);
@@ -162,6 +233,21 @@ export default function Predict() {
   const valid = results?.filter((r) => r.shear_modulus_gpa !== null) ?? [];
   const failed = results?.filter((r) => r.shear_modulus_gpa === null) ?? [];
   const scaleMax = Math.max(...valid.map((r) => r.high_gpa ?? 0), 1);
+
+  useEffect(() => {
+    if (view !== "known" || valid.length === 0) return;
+    for (const r of valid) {
+      if (known[r.formula] !== undefined) continue;
+      setKnown((k) => ({ ...k, [r.formula]: "loading" }));
+      fetch(`${API_BASE}/structure?formula=${encodeURIComponent(r.formula)}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((d: Known | null) =>
+          setKnown((k) => ({ ...k, [r.formula]: d && d.polymorphs > 0 ? d : "none" })),
+        )
+        .catch(() => setKnown((k) => ({ ...k, [r.formula]: "none" })));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, results]);
 
   return (
     <div className="predict">
@@ -176,12 +262,12 @@ export default function Predict() {
           className="predict__input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type chemical formulas — WC, TiB2, B4C…"
+          placeholder="Type chemical formulas, like WC, TiB2, B4C"
           spellCheck={false}
           autoFocus
         />
         <button className="predict__go" type="submit" disabled={loading || !parse(input).length}>
-          {loading ? "Screening…" : "Screen"}
+          {loading ? "Screening" : "Screen"}
         </button>
       </form>
 
@@ -204,7 +290,7 @@ export default function Predict() {
             run(CLASSICS);
           }}
         >
-          Screen the classics →
+          Screen the classics
         </button>
       </div>
 
@@ -213,175 +299,279 @@ export default function Predict() {
       {loading && <PipelineLoading formulas={pending} />}
 
       {!loading && valid.length > 0 && (
-        <ol className="results">
-          {valid.map((r) => {
-            const lo = ((r.low_gpa ?? 0) / scaleMax) * 100;
-            const hi = ((r.high_gpa ?? 0) / scaleMax) * 100;
-            const mid = ((r.shear_modulus_gpa ?? 0) / scaleMax) * 100;
-            return (
-              <li className="result" key={r.formula}>
-                <div className="result__main">
-                  <span className="result__rank">{r.rank}</span>
-                  <span className="result__formula">{r.formula}</span>
-                  <span className="result__bar" aria-hidden="true">
-                    <i
-                      className="result__band"
-                      style={{ left: `${Math.max(lo, 0)}%`, width: `${hi - Math.max(lo, 0)}%` }}
-                    />
-                    <i className="result__dot" style={{ left: `${mid}%` }} />
-                  </span>
-                  <span className="result__val">
-                    {r.shear_modulus_gpa}
-                    <em> GPa · 90% ± {r.shear_conformal90_gpa ?? r.uncertainty_gpa}</em>
-                  </span>
-                  <span className="result__badge">{r.evidence_status ?? "SCREENING_ONLY"}</span>
-                </div>
-                <div className="result__props">
-                  {r.domain && (
-                    <span
-                      className={`prop prop--tag ${
-                        r.domain === "in_domain" ? "prop--ductile" : "prop--brittle"
-                      }`}
-                    >
-                      <b>{r.domain === "in_domain" ? "in domain" : "extrapolating"}</b>
+        <div className="rview">
+          <div className="seg" role="tablist">
+            {VIEWS.map((v) => (
+              <button
+                key={v.id}
+                role="tab"
+                aria-selected={view === v.id}
+                className={view === v.id ? "seg__btn is-on" : "seg__btn"}
+                onClick={() => setView(v.id)}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+          <p className="rview__def">{VIEW_DEFS[view]}</p>
+
+          <ol className="rlist">
+            {valid.map((r) => {
+              const k = known[r.formula];
+              return (
+                <li className="rrow" key={r.formula}>
+                  <header className="rrow__head">
+                    <span className="rrow__rank">
+                      {String(r.rank).padStart(2, "0")}
                     </span>
-                  )}
-                  <span className="prop">
-                    <label>shear G</label>
-                    <b>
-                      {r.shear_modulus_gpa} <i>GPa · ±{r.shear_conformal90_gpa ?? r.uncertainty_gpa}</i>
-                    </b>
-                  </span>
-                  {r.bulk_modulus_gpa != null && (
-                    <span className="prop">
-                      <label>bulk K</label>
-                      <b>
-                        {r.bulk_modulus_gpa} <i>GPa · ±{r.bulk_conformal90_gpa ?? r.bulk_uncertainty_gpa}</i>
-                      </b>
-                    </span>
-                  )}
-                  {r.youngs_modulus_gpa != null && (
-                    <span className="prop">
-                      <label>Young's E</label>
-                      <b>
-                        {r.youngs_modulus_gpa} <i>GPa</i>
-                      </b>
-                    </span>
-                  )}
-                  {r.poisson_ratio != null && (
-                    <span className="prop">
-                      <label>Poisson ν</label>
-                      <b>{r.poisson_ratio}</b>
-                    </span>
-                  )}
-                  {r.vickers_hardness_gpa != null && (
-                    <span className="prop">
-                      <label>est. hardness Hᵥ</label>
-                      <b>
-                        {r.vickers_hardness_gpa} <i>GPa</i>
-                      </b>
-                    </span>
-                  )}
-                  {r.band_gap_ev != null && (
-                    <span className="prop">
-                      <label>band gap</label>
-                      <b>
-                        {r.band_gap_ev} <i>eV · ±{r.band_gap_conformal90_ev ?? r.band_gap_uncertainty_ev}</i>
-                      </b>
-                    </span>
-                  )}
-                  {r.electronic_class && (
-                    <span className={`prop prop--tag prop--elec`}>
-                      <b>{r.electronic_class}</b>
-                    </span>
-                  )}
-                  {r.character && (
-                    <span
-                      className={`prop prop--tag ${
-                        r.character === "less brittle" ? "prop--ductile" : "prop--brittle"
-                      }`}
-                    >
-                      <label>Pugh</label>
-                      <b>{r.character}</b>
-                    </span>
-                  )}
-                </div>
-                {(r.density_est_gcc != null || r.acoustic_impedance_mrayl != null) && (
-                  <div className="result__props result__props--impact">
-                    {r.density_est_gcc != null && (
-                      <span className="prop">
-                        <label>ρ est.</label>
-                        <b>
-                          {r.density_est_gcc} <i>g/cm³</i>
-                        </b>
+                    <span className="rrow__formula">{r.formula}</span>
+                    {r.domain && (
+                      <span
+                        className={`rrow__tag ${
+                          r.domain === "in_domain" ? "rrow__tag--in" : "rrow__tag--out"
+                        }`}
+                      >
+                        {r.domain === "in_domain" ? "In domain" : "Extrapolating"}
                       </span>
                     )}
-                    {r.specific_stiffness_gpa_gcc != null && (
-                      <span className="prop">
-                        <label>E/ρ</label>
-                        <b>
-                          {r.specific_stiffness_gpa_gcc} <i>GPa·cm³/g</i>
-                        </b>
-                      </span>
-                    )}
-                    {r.sound_speed_shear_ms != null && (
-                      <span className="prop">
-                        <label>shear wave vₛ</label>
-                        <b>
-                          {r.sound_speed_shear_ms.toLocaleString()} <i>m/s</i>
-                        </b>
-                      </span>
-                    )}
-                    {r.acoustic_impedance_mrayl != null && (
-                      <span className="prop">
-                        <label>impedance Z</label>
-                        <b>
-                          {r.acoustic_impedance_mrayl} <i>MRayl</i>
-                        </b>
-                      </span>
-                    )}
-                    {r.kmin_clarke_w_mk != null && (
-                      <span className="prop">
-                        <label>κ min (Clarke)</label>
-                        <b>
-                          {r.kmin_clarke_w_mk} <i>W/m·K</i>
-                        </b>
-                      </span>
-                    )}
-                  </div>
-                )}
-                {r.neighbors && r.neighbors.length > 0 && (
-                  <p className="result__nbrs">
-                    nearest training materials:{" "}
-                    {r.neighbors.map((n, i) => (
-                      <span key={n.formula + i}>
-                        {i > 0 && " · "}
-                        <code>{n.formula}</code> {n.shear_modulus_gpa} GPa
-                      </span>
-                    ))}{" "}
-                    <em>(measured)</em>
-                  </p>
-                )}
-              </li>
-            );
-          })}
-        </ol>
+                    <span className="rrow__badge">Screening only</span>
+                  </header>
+
+                  {view === "ranked" && (
+                    <>
+                      <div className="rbar">
+                        <div className="rbar__track">
+                          <i
+                            className="rbar__band"
+                            style={{
+                              left: `${Math.max(((r.low_gpa ?? 0) / scaleMax) * 100, 0)}%`,
+                              width: `${(((r.high_gpa ?? 0) - Math.max(r.low_gpa ?? 0, 0)) / scaleMax) * 100}%`,
+                            }}
+                          />
+                          <i
+                            className="rbar__fill"
+                            style={{ width: `${((r.shear_modulus_gpa ?? 0) / scaleMax) * 100}%` }}
+                          />
+                        </div>
+                        <span className="rbar__val">
+                          {r.shear_modulus_gpa} GPa{" "}
+                          <em>± {r.shear_conformal90_gpa ?? r.uncertainty_gpa} at 90 percent</em>
+                        </span>
+                      </div>
+                      {r.neighbors && r.neighbors.length > 0 && (
+                        <p className="rrow__nbrs">
+                          Closest training materials:{" "}
+                          {r.neighbors.map((n, i) => (
+                            <span key={n.formula + i}>
+                              {i > 0 && ", "}
+                              <code>{n.formula}</code> {n.shear_modulus_gpa} GPa
+                            </span>
+                          ))}{" "}
+                          (measured)
+                        </p>
+                      )}
+                    </>
+                  )}
+
+                  {view === "mechanical" && (
+                    <div className="pgrid">
+                      <Cell
+                        name="Shear modulus G"
+                        value={r.shear_modulus_gpa ?? 0}
+                        unit={`GPa ± ${r.shear_conformal90_gpa ?? r.uncertainty_gpa}`}
+                        caption="Resistance to changing shape"
+                      />
+                      {r.bulk_modulus_gpa != null && (
+                        <Cell
+                          name="Bulk modulus K"
+                          value={r.bulk_modulus_gpa}
+                          unit={`GPa ± ${r.bulk_conformal90_gpa ?? r.bulk_uncertainty_gpa}`}
+                          caption="Resistance to compression"
+                        />
+                      )}
+                      {r.youngs_modulus_gpa != null && (
+                        <Cell
+                          name="Young's modulus E"
+                          value={r.youngs_modulus_gpa}
+                          unit="GPa"
+                          caption="Stiffness in a pull test, from K and G"
+                        />
+                      )}
+                      {r.poisson_ratio != null && (
+                        <Cell
+                          name="Poisson's ratio ν"
+                          value={r.poisson_ratio}
+                          caption="Sideways spread when stretched"
+                        />
+                      )}
+                      {r.vickers_hardness_gpa != null && (
+                        <Cell
+                          name="Estimated hardness"
+                          value={r.vickers_hardness_gpa}
+                          unit="GPa"
+                          caption="Scratch and dent resistance, Chen-Niu estimate, not a test"
+                        />
+                      )}
+                      {r.character && (
+                        <Cell
+                          name="Pugh tendency"
+                          value={r.character}
+                          caption="Leaning toward brittle or tougher failure, an indicator only"
+                          tone={r.character === "less brittle" ? "good" : "warn"}
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  {view === "impact" && (
+                    <div className="pgrid">
+                      {r.density_est_gcc != null && (
+                        <Cell
+                          name="Density, estimated"
+                          value={r.density_est_gcc}
+                          unit="g/cm³"
+                          caption="Weight per volume, from element data"
+                        />
+                      )}
+                      {r.specific_stiffness_gpa_gcc != null && (
+                        <Cell
+                          name="Specific stiffness E/ρ"
+                          value={r.specific_stiffness_gpa_gcc}
+                          unit="GPa·cm³/g"
+                          caption="Stiffness per unit weight, key for light structures"
+                        />
+                      )}
+                      {r.sound_speed_shear_ms != null && (
+                        <Cell
+                          name="Shear wave speed"
+                          value={r.sound_speed_shear_ms}
+                          unit="m/s"
+                          caption="How fast a shape wave travels through it"
+                        />
+                      )}
+                      {r.sound_speed_long_ms != null && (
+                        <Cell
+                          name="Pressure wave speed"
+                          value={r.sound_speed_long_ms}
+                          unit="m/s"
+                          caption="How fast a compression wave travels"
+                        />
+                      )}
+                      {r.acoustic_impedance_mrayl != null && (
+                        <Cell
+                          name="Acoustic impedance"
+                          value={r.acoustic_impedance_mrayl}
+                          unit="MRayl"
+                          caption="How it passes or reflects shock, used to layer armor"
+                          tone="accent"
+                        />
+                      )}
+                      {r.kmin_clarke_w_mk != null && (
+                        <Cell
+                          name="Minimum heat flow"
+                          value={r.kmin_clarke_w_mk}
+                          unit="W/m·K"
+                          caption="Lower bound on thermal conductivity, Clarke model"
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  {view === "electronic" && (
+                    <div className="pgrid">
+                      {r.band_gap_ev != null && (
+                        <Cell
+                          name="Band gap"
+                          value={r.band_gap_ev}
+                          unit={`eV ± ${r.band_gap_conformal90_ev ?? r.band_gap_uncertainty_ev}`}
+                          caption="Energy gap that sets electrical behavior"
+                        />
+                      )}
+                      {r.electronic_class && (
+                        <Cell
+                          name="Electronic class"
+                          value={r.electronic_class}
+                          caption="Metal conducts, semiconductor switches, insulator blocks"
+                          tone="accent"
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  {view === "known" && (
+                    <div className="pgrid">
+                      {k === "loading" || k === undefined ? (
+                        <Cell name="Materials Project" value="Looking up" caption="Querying known crystal structures" />
+                      ) : k === "none" ? (
+                        <Cell
+                          name="Materials Project"
+                          value="No entry"
+                          caption="No known crystal for this composition. Our estimate is the only number available."
+                        />
+                      ) : (
+                        <>
+                          <Cell
+                            name="Known structures"
+                            value={k.polymorphs}
+                            caption="Crystal forms of this composition in the database"
+                          />
+                          {k.stable?.crystal_system && (
+                            <Cell
+                              name="Most stable form"
+                              value={`${k.stable.crystal_system}${k.stable.spacegroup ? ", " + k.stable.spacegroup : ""}`}
+                              caption={`Lowest energy structure, ${k.stable.material_id}`}
+                            />
+                          )}
+                          {k.stable?.density_gcc != null && (
+                            <Cell
+                              name="Published density"
+                              value={k.stable.density_gcc}
+                              unit="g/cm³"
+                              caption={`Ours, estimated: ${r.density_est_gcc ?? "n/a"} g/cm³`}
+                            />
+                          )}
+                          {k.stable?.dft_shear_gpa != null && (
+                            <Cell
+                              name="Published shear G, DFT"
+                              value={k.stable.dft_shear_gpa}
+                              unit="GPa"
+                              caption={`Ours, composition only: ${r.shear_modulus_gpa} GPa`}
+                              tone="accent"
+                            />
+                          )}
+                          {k.stable?.dft_bulk_gpa != null && (
+                            <Cell
+                              name="Published bulk K, DFT"
+                              value={k.stable.dft_bulk_gpa}
+                              unit="GPa"
+                              caption={`Ours, composition only: ${r.bulk_modulus_gpa ?? "n/a"} GPa`}
+                              tone="accent"
+                            />
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </div>
       )}
 
       {!loading && failed.length > 0 && (
         <p className="predict__failed">
-          Not recognised: {failed.map((r) => r.formula).join(", ")} — check the chemistry.
+          Not recognised: {failed.map((r) => r.formula).join(", ")}. Check the chemistry.
         </p>
       )}
 
       {!loading && valid.length > 0 && (
         <p className="predict__note">
-          Composition-only estimates, ranked by shear modulus — a formula does not specify
-          crystal phase, microstructure, or processing. The ± values are split-conformal 90%
-          intervals: calibrated so 90% of held-out materials land inside, and verified at
-          90–91% coverage on the test set. Hardness is the Chen–Niu intrinsic estimate, not an
-          indentation test; the Pugh tag is a brittleness-tendency indicator; density and the
-          impact row are physics-derived from element data and the predicted moduli.
+          These are composition-only estimates. A formula does not specify crystal phase,
+          microstructure, or processing. The ± values are calibrated 90 percent ranges,
+          verified at 90 to 91 percent coverage on held-out materials. Hardness is a Chen-Niu
+          estimate, not an indentation test. Use the Known data tab to compare with published
+          values.
         </p>
       )}
     </div>

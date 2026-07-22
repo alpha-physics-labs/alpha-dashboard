@@ -75,7 +75,7 @@ export default function Chart() {
             SCARCE-DATA REGIME
           </text>
           <text x={xOf(20) + 10} y={H - M.b - 11} className="chart__zoneSub">
-            real impact tests: 20–80 coupons
+            real impact tests: 20 to 80 coupons
           </text>
 
           {/* grid + axes */}

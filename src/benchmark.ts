@@ -21,7 +21,7 @@ export const PHYSICS_LAW =
   "log G = c₀ + a₁·log VED + a₂·log COH − b₁·ionicity − a₃·log r_cov";
 
 export const SERIES = [
-  { key: "data_net_mae", label: "Data-only neural net", color: "#BE7F1C" },
-  { key: "xgboost_mae", label: "XGBoost", color: "#2E9F7E" },
-  { key: "physics_net_mae", label: "Physics-informed net", color: "#4E90F2" },
+  { key: "data_net_mae", label: "Data-only neural net", color: "#B0761A" },
+  { key: "xgboost_mae", label: "XGBoost", color: "#1F8A6D" },
+  { key: "physics_net_mae", label: "Physics-informed net", color: "#2F6FD0" },
 ] as const;
