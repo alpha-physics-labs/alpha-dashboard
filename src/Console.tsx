@@ -633,15 +633,26 @@ export default function Console() {
           {card && (
             <details className="about">
               <summary>About the model</summary>
-              <p>
-                Trained heads:{" "}
-                {(card.heads ?? [])
-                  .map((h) => `${h.target} R² ${h.r2}, MAE ${h.mae} ${h.unit}`)
-                  .join(" · ")}
-                . Ranges are calibrated 90 percent intervals, verified at 90 to 91 percent
-                coverage. Splits are grouped by formula. Composition-only estimates: a formula
-                does not specify crystal phase or processing.
-              </p>
+              <div className="about__body">
+                <p>
+                  <b>What it predicts.</b> Stiffness (shear and bulk) and band gap, learned from
+                  9,749 public materials. Every other number comes from physics formulas applied
+                  to those predictions.
+                </p>
+                <p>
+                  <b>How accurate.</b> On materials it never saw, stiffness is off by about 9
+                  GPa on average, band gap by about 0.4 eV.
+                </p>
+                <p>
+                  <b>The ± range.</b> The true value should land inside the range 90 percent of
+                  the time. We checked on held-out materials: it does.
+                </p>
+                <p>
+                  <b>The honest limits.</b> No material appears in both training and testing. A
+                  formula cannot say how a sample was made, so treat every number as a first
+                  screen, not a final answer.
+                </p>
+              </div>
             </details>
           )}
         </aside>

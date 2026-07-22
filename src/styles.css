@@ -38,9 +38,9 @@ html {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-sans);
-  font-size: 16.5px;
-  line-height: 1.55;
+  font-family: var(--font-serif);
+  font-size: 17.5px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -908,8 +908,9 @@ button {
 }
 .cell__name {
   display: block;
-  font-size: 12.5px;
-  font-weight: 600;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14.5px;
   color: var(--ink-2);
 }
 .cell__val {
@@ -927,7 +928,7 @@ button {
 }
 .cell__cap {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ink-3);
   margin-top: 3px;
   line-height: 1.4;
@@ -1527,11 +1528,21 @@ button {
   color: var(--ink-3);
   cursor: pointer;
 }
-.about p {
+.about__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-top: 8px;
-  font-size: 12.5px;
+}
+.about p {
+  font-size: 13.5px;
   color: var(--ink-3);
-  line-height: 1.55;
+  line-height: 1.5;
+}
+.about p b {
+  color: var(--ink-2);
+  font-weight: 400;
+  font-style: italic;
 }
 
 /* detail area */
@@ -1738,18 +1749,20 @@ button {
   stroke: #eeeef2;
 }
 .stick {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-family: var(--font-serif);
+  font-size: 12px;
   fill: var(--ink-3);
 }
 .saxis {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  fill: var(--ink-3);
-  letter-spacing: 0.04em;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  fill: var(--ink-2);
+  letter-spacing: 0.02em;
 }
 .slabel {
-  font-size: 10.5px;
+  font-family: var(--font-serif);
+  font-size: 12px;
   fill: var(--ink-3);
 }
 .slabel--batch {
@@ -1795,8 +1808,9 @@ button {
   align-items: center;
 }
 .pbar__name {
-  font-size: 13px;
-  font-weight: 600;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
   color: var(--ink-2);
 }
 .pbar__track {
@@ -1848,8 +1862,10 @@ button {
   border-radius: 10px 10px 0 0;
 }
 .matrix tbody th {
-  font-size: 12.5px;
-  font-weight: 600;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14.5px;
   color: var(--ink-2);
   text-align: left;
   padding: 10px 14px;
@@ -1857,6 +1873,7 @@ button {
 }
 .matrix tbody th i {
   font-style: normal;
+  font-family: var(--font-sans);
   font-weight: 400;
   color: var(--ink-3);
   font-size: 11px;
