@@ -332,6 +332,90 @@ type Known = {
 };
 type KnownState = Known | "loading" | "none";
 
+/* ────────────────────────── comparison table ────────────────────────── */
+
+type Col = {
+  label: string;
+  unit: string;
+  get: (r: Prediction) => number | string | undefined;
+  max?: number;
+};
+
+const COLS: Col[] = [
+  { label: "Shear G", unit: "GPa", get: (r) => r.shear_modulus_gpa ?? undefined, max: 300 },
+  { label: "Bulk K", unit: "GPa", get: (r) => r.bulk_modulus_gpa, max: 420 },
+  { label: "Young E", unit: "GPa", get: (r) => r.youngs_modulus_gpa, max: 700 },
+  { label: "Poisson ν", unit: "", get: (r) => r.poisson_ratio, max: 0.5 },
+  { label: "Hardness", unit: "GPa", get: (r) => r.vickers_hardness_gpa, max: 40 },
+  { label: "Density", unit: "g/cm³", get: (r) => r.density_est_gcc, max: 16 },
+  { label: "E/ρ", unit: "", get: (r) => r.specific_stiffness_gpa_gcc, max: 180 },
+  { label: "Impedance", unit: "MRayl", get: (r) => r.acoustic_impedance_mrayl, max: 110 },
+  { label: "Gap", unit: "eV", get: (r) => r.band_gap_ev, max: 6 },
+  { label: "Class", unit: "", get: (r) => r.electronic_class },
+  { label: "Pugh", unit: "", get: (r) => r.character },
+];
+
+function CompareTable({
+  batch,
+  selected,
+  onSelect,
+}: {
+  batch: Prediction[];
+  selected: Prediction;
+  onSelect: (formula: string) => void;
+}) {
+  return (
+    <section className="detail__sec">
+      <h3>Comparison table</h3>
+      <p className="ctable__cap">
+        Every screened material side by side. Deeper blue means a larger value in that column.
+        Click a row to inspect it.
+      </p>
+      <div className="ctable__wrap">
+        <table className="ctable">
+          <thead>
+            <tr>
+              <th>Material</th>
+              {COLS.map((c) => (
+                <th key={c.label}>
+                  {c.label}
+                  {c.unit && <i> {c.unit}</i>}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {batch.map((r) => (
+              <tr
+                key={r.formula}
+                className={r.formula === selected.formula ? "is-sel" : ""}
+                onClick={() => onSelect(r.formula)}
+              >
+                <td>{r.formula}</td>
+                {COLS.map((c) => {
+                  const v = c.get(r);
+                  const tint =
+                    typeof v === "number" && c.max
+                      ? Math.min(Math.abs(v) / c.max, 1) * 0.16
+                      : 0;
+                  return (
+                    <td
+                      key={c.label}
+                      style={tint ? { background: `rgba(10, 99, 216, ${tint})` } : undefined}
+                    >
+                      {v == null ? "–" : typeof v === "number" ? v.toLocaleString() : v}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 /* ────────────────────────── property cells ────────────────────────── */
 
 function Cell({
@@ -689,6 +773,8 @@ export default function Console() {
                 <Ashby batch={valid} selected={sel} />
                 <Profile selected={sel} />
               </div>
+
+              <CompareTable batch={valid} selected={sel} onSelect={setSelected} />
 
               <section className="detail__sec">
                 <h3>Impact and thermal</h3>

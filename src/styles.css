@@ -149,8 +149,11 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
   font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
   color: var(--ink-2);
   padding: 7px 13px;
   border-radius: var(--r-el);
@@ -177,8 +180,11 @@ button {
   }
 }
 .top__badge {
-  font-size: 12.5px;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
   color: var(--warn);
   background: var(--warn-soft);
   border-radius: var(--r-el);
@@ -808,8 +814,11 @@ button {
   font-size: 17px;
 }
 .rrow__tag {
-  font-size: 12px;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   border-radius: 6px;
   padding: 3px 9px;
 }
@@ -823,8 +832,11 @@ button {
 }
 .rrow__badge {
   margin-left: auto;
-  font-size: 12px;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--ink-3);
   background: var(--bg);
   border-radius: 6px;
@@ -1368,7 +1380,10 @@ button {
   letter-spacing: -0.01em;
 }
 .bar__brand span {
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--ink-3);
 }
 .bar__right {
@@ -1604,12 +1619,81 @@ button {
   animation: rise 0.5s var(--ease) both;
 }
 .detail__sec h3 {
-  font-size: 14px;
-  font-weight: 650;
-  letter-spacing: 0.06em;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-3);
   margin-bottom: 10px;
+}
+
+/* comparison table */
+.ctable__cap {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-bottom: 10px;
+}
+.ctable__wrap {
+  overflow-x: auto;
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.ctable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.ctable th {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: right;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+}
+.ctable th i {
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #a6a6ad;
+}
+.ctable th:first-child {
+  text-align: left;
+}
+.ctable td {
+  text-align: right;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.ctable td:first-child {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ctable tbody tr {
+  transition: background 0.12s;
+}
+.ctable tbody tr:hover td {
+  background: var(--bg);
+}
+.ctable tbody tr.is-sel td {
+  background: var(--accent-soft);
+}
+.ctable tbody tr:last-child td {
+  border-bottom: none;
 }
 .detail__figs {
   display: grid;
