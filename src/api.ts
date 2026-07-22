@@ -30,6 +30,7 @@ export type Prediction = {
   band_gap_conformal90_ev?: number;
   domain?: "in_domain" | "extrapolating" | "out_of_scope";
   scope_note?: string;
+  reduced_formula?: string;
   neighbors?: { formula: string; shear_modulus_gpa: number }[];
   density_est_gcc?: number;
   sound_speed_shear_ms?: number;

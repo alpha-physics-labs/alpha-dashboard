@@ -539,6 +539,15 @@ export default function Console() {
   const failed = results?.filter((r) => r.shear_modulus_gpa === null) ?? [];
   const sel = valid.find((r) => r.formula === selected) ?? valid[0];
 
+  /* Screening a neighbour adds it to the current batch so the two sit side by side. */
+  const screenNeighbour = (formula: string) => {
+    const current = parse(input);
+    const next = current.includes(formula) ? current : [...current, formula];
+    const joined = next.join(" ");
+    setInput(joined);
+    run(joined, formula);
+  };
+
   useEffect(() => {
     if (!sel || known[sel.formula] !== undefined) return;
     setKnown((k) => ({ ...k, [sel.formula]: "loading" }));
@@ -551,7 +560,7 @@ export default function Console() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sel?.formula]);
 
-  const run = async (raw: string) => {
+  const run = async (raw: string, selectAfter?: string) => {
     const formulas = parse(raw);
     if (formulas.length === 0 || loading) return;
     setLoading(true);
@@ -563,7 +572,9 @@ export default function Console() {
       const remaining = MIN_SHOW_MS - (Date.now() - started);
       if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
       setResults(res);
-      setSelected(res.find((r) => r.shear_modulus_gpa !== null)?.formula ?? null);
+      setSelected(
+        selectAfter ?? res.find((r) => r.shear_modulus_gpa !== null)?.formula ?? null,
+      );
       setKnown({});
     } catch {
       setError(
@@ -728,6 +739,47 @@ export default function Console() {
             </ol>
           )}
 
+          <details className="about" open>
+            <summary>What the badges mean</summary>
+            <table className="flags">
+              <tbody>
+                <tr>
+                  <td><span className="rrow__tag rrow__tag--in">In domain</span></td>
+                  <td>
+                    Chemically similar to many materials the model trained on. Trust the number
+                    and its stated range.
+                  </td>
+                </tr>
+                <tr>
+                  <td><span className="rrow__tag rrow__tag--out">Extrapolating</span></td>
+                  <td>
+                    Unlike anything the model learned from, so it is reaching. Still our best
+                    estimate, but trust it less than the range alone suggests. We measured the
+                    cost: remove a whole chemical family from training and error roughly triples.
+                  </td>
+                </tr>
+                <tr>
+                  <td><span className="rrow__tag rrow__tag--stop">Out of scope</span></td>
+                  <td>
+                    We refuse to answer. Polymers such as Kevlar get their strength from fibre
+                    processing rather than chemistry, so a formula cannot carry the answer.
+                  </td>
+                </tr>
+                <tr>
+                  <td><span className="rrow__badge">Screening only</span></td>
+                  <td>
+                    Decision support for which materials to test first. Not certified design
+                    values and not a survivability claim.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p className="about__note">
+              The flag comes from how far the material sits, in feature space, from the nearest
+              materials the model was trained on.
+            </p>
+          </details>
+
           {card && (
             <details className="about">
               <summary>About the model</summary>
@@ -790,6 +842,13 @@ export default function Console() {
                   )}
                   <span className="rrow__badge">Screening only</span>
                 </div>
+                {sel.reduced_formula && (
+                  <p className="detail__reduced">
+                    You typed <code>{sel.formula}</code>, which is the same composition as{" "}
+                    <code>{sel.reduced_formula}</code>. A formula is a ratio, so we evaluated{" "}
+                    <code>{sel.reduced_formula}</code>.
+                  </p>
+                )}
                 {sel.scope_note && <p className="detail__scope">{sel.scope_note}</p>}
                 <div className="detail__hero">
                   <span className="detail__heroVal">
@@ -814,16 +873,27 @@ export default function Console() {
                   </span>
                 </div>
                 {sel.neighbors && sel.neighbors.length > 0 && (
-                  <p className="rrow__nbrs">
-                    Closest training materials:{" "}
-                    {sel.neighbors.map((n, i) => (
-                      <span key={n.formula + i}>
-                        {i > 0 && ", "}
-                        <code>{n.formula}</code> {n.shear_modulus_gpa} GPa
-                      </span>
-                    ))}{" "}
-                    (measured)
-                  </p>
+                  <div className="nbrs">
+                    <p className="nbrs__lead">
+                      <b>What this prediction is based on.</b> These are the closest materials
+                      in our training data, with their <em>measured</em> shear modulus. If they
+                      sit near the prediction, the answer is well supported. If they scatter
+                      widely, treat it with more caution. Click any one to screen it yourself.
+                    </p>
+                    <div className="nbrs__list">
+                      {sel.neighbors.map((n, i) => (
+                        <button
+                          key={n.formula + i}
+                          className="nbr"
+                          onClick={() => screenNeighbour(n.formula)}
+                          title={`Screen ${n.formula}`}
+                        >
+                          <b>{n.formula}</b>
+                          <span>{n.shear_modulus_gpa} GPa measured</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </header>
 
