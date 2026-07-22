@@ -1531,6 +1531,10 @@ button {
   gap: 0;
   align-items: start;
 }
+/* The hidden attribute must win over the display rule above. */
+.work[hidden] {
+  display: none;
+}
 .side {
   position: sticky;
   top: 57px;
