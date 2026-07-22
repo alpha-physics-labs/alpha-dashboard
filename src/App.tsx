@@ -15,12 +15,14 @@ const FALLBACK_CARD: ModelCard = {
   heads: [
     { target: "shear_modulus", unit: "GPa", r2: 0.84, mae: 9.3, n_train: 7799, n_test: 1950 },
     { target: "bulk_modulus", unit: "GPa", r2: 0.879, mae: 13.1, n_train: 7800, n_test: 1951 },
+    { target: "band_gap", unit: "eV", r2: 0.716, mae: 0.43, n_train: 3683, n_test: 921 },
   ],
   derived: [
-    "youngs_modulus (isotropic elasticity)",
-    "poisson_ratio (isotropic elasticity)",
-    "vickers_hardness (Chen–Niu 2011 estimate)",
-    "pugh_ratio → ductile/brittle character",
+    "youngs_modulus (isotropic aggregate approximation)",
+    "poisson_ratio (isotropic aggregate approximation)",
+    "vickers_hardness (Chen–Niu intrinsic estimate, not an indentation test)",
+    "pugh_ratio → brittleness-tendency indicator, not a measured failure mode",
+    "electronic_class (from estimated gap; conventional thresholds)",
   ],
 };
 
@@ -116,8 +118,9 @@ export default function App() {
             <span>Get physics back.</span>
           </h1>
           <p className="hero__sub">
-            Any chemical formula becomes 132 physics descriptors, two trained model heads, and
-            six material properties with honest uncertainty — in about a second.
+            Enter a chemical formula: 132 composition descriptors, three trained heads — shear,
+            bulk, band gap — and derived elastic screening indicators, in about a second. Every
+            value ships with its held-out benchmark error.
           </p>
           <Predict />
         </section>
@@ -163,10 +166,12 @@ export default function App() {
         <section className="sec" style={{ animationDelay: "240ms" }}>
           <div className="sec__head">
             <p className="sec__label">03 · One engine, many markets</p>
-            <h2 className="sec__h">Every impact market shares the same physics.</h2>
+            <h2 className="sec__h">One engine. A property head per market.</h2>
             <p className="sec__sub">
-              One featurization layer, one physics-informed core, a head per property. Training a
-              new head is a week of work — not a new company.
+              Several impact and materials markets share useful property foundations — stiffness,
+              intrinsic hardness, electronic class. Each application still requires its own data
+              and validation; the engine makes adding that head a week of work, not a new company.
+              The band-gap head was trained <em>today</em> to prove it.
             </p>
           </div>
           <div className="markets">
@@ -212,7 +217,25 @@ export default function App() {
             </div>
             <div>
               <dt>Training set</dt>
-              <dd>{card.n_train.toLocaleString()} materials, public data</dd>
+              <dd>
+                Public data, mixed experimental and DFT-derived. Split is grouped by formula — no
+                composition appears in both train and test.
+              </dd>
+            </div>
+            <div>
+              <dt>Uncertainty basis</dt>
+              <dd>
+                The ± on each value is that head's global held-out test MAE. Material-specific
+                intervals are not yet calibrated.
+              </dd>
+            </div>
+            <div>
+              <dt>Scope</dt>
+              <dd>
+                Composition-only estimates: a formula does not specify crystal phase,
+                microstructure, temperature, or processing. Values represent training-set-average
+                behavior for similar compositions.
+              </dd>
             </div>
             <div>
               <dt>Evidence status</dt>

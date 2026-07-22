@@ -1,16 +1,139 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { predict, type Prediction } from "./api";
 
-const PRESETS = ["WC", "TiB2", "B4C", "SiC", "Al2O3", "Si3N4", "TiC", "ZrB2"];
+const PRESETS = ["WC", "TiB2", "B4C", "SiC", "Al2O3", "Si", "GaAs", "ZrO2"];
 const CLASSICS = "WC TiB2 B4C SiC Al2O3";
 
 function parse(input: string): string[] {
   return [...new Set(input.split(/[\s,;]+/).filter(Boolean))].slice(0, 25);
 }
 
+/* ── pipeline animation: the real inference steps, visualized ── */
+
+const STEPS = [
+  "parsing compositions",
+  "computing elemental descriptors",
+  "assembling the 132-dimension feature vector",
+  "evaluating trained heads · G, K, band gap",
+  "applying elasticity relations · E, ν, Hᵥ, Pugh",
+  "classifying electronic character",
+];
+const STEP_MS = 900;
+const MIN_SHOW_MS = STEPS.length * STEP_MS + 400;
+
+const DESCRIPTORS = [
+  "electronegativity",
+  "covalent radius",
+  "valence electrons",
+  "melting point",
+  "atomic volume",
+  "ionization character",
+  "d-electron fraction",
+  "ground-state volume",
+  "atomic mass",
+  "unfilled orbitals",
+  "space-group statistics",
+  "s/p/d/f occupancy",
+];
+
+const HEAD_NODES = ["shear G", "bulk K", "band gap"];
+
+function parseElements(formulas: string[]): [string, number][] {
+  const counts = new Map<string, number>();
+  for (const f of formulas) {
+    for (const m of f.matchAll(/([A-Z][a-z]?)(\d*\.?\d*)/g)) {
+      const n = m[2] ? parseFloat(m[2]) : 1;
+      counts.set(m[1], (counts.get(m[1]) ?? 0) + n);
+    }
+  }
+  return [...counts.entries()].slice(0, 12);
+}
+
+function PipelineLoading({ formulas }: { formulas: string[] }) {
+  const [step, setStep] = useState(0);
+  const [tick, setTick] = useState(0);
+  const elements = useMemo(() => parseElements(formulas), [formulas]);
+
+  useEffect(() => {
+    const stepper = setInterval(
+      () => setStep((s) => Math.min(s + 1, STEPS.length - 1)),
+      STEP_MS,
+    );
+    const ticker = setInterval(() => setTick((t) => t + 1), 210);
+    return () => {
+      clearInterval(stepper);
+      clearInterval(ticker);
+    };
+  }, []);
+
+  return (
+    <div className="pload" role="status" aria-label="Prediction in progress">
+      <i className="pload__wave" aria-hidden="true" />
+      <div className="pload__left">
+        <div className="pload__elements">
+          {elements.map(([sym], i) => (
+            <span className="el" key={sym} style={{ animationDelay: `${i * 110}ms` }}>
+              <b>{sym}</b>
+              <i className="el__orbit" aria-hidden="true" />
+              <i className="el__orbit el__orbit--2" aria-hidden="true" />
+            </span>
+          ))}
+        </div>
+        <ol className="pload__steps">
+          {STEPS.map((s, i) => (
+            <li
+              key={s}
+              className={i < step ? "is-done" : i === step ? "is-active" : ""}
+            >
+              <i />
+              {s}
+              {i === 1 && i === step && (
+                <em> — {DESCRIPTORS[tick % DESCRIPTORS.length]}</em>
+              )}
+            </li>
+          ))}
+        </ol>
+        {step >= 4 && (
+          <p className="pload__eq">
+            E = 9KG / (3K + G) &nbsp;·&nbsp; ν = (3K − 2G) / 2(3K + G) &nbsp;·&nbsp; Hᵥ =
+            2(k²G)<sup>0.585</sup> − 3
+          </p>
+        )}
+      </div>
+      <div className="pload__right">
+        <div className="pload__grid" aria-hidden="true">
+          {Array.from({ length: 132 }, (_, i) => (
+            <i
+              key={i}
+              className={step >= 1 ? "fg on" : "fg"}
+              style={{ animationDelay: `${STEP_MS + i * 11}ms` }}
+            />
+          ))}
+          <i className={step >= 2 ? "pload__scan" : ""} aria-hidden="true" />
+        </div>
+        <span className="pload__gridLabel">132 physics descriptors</span>
+        <div className="pload__heads" aria-hidden="true">
+          {HEAD_NODES.map((h, i) => (
+            <span
+              key={h}
+              className={step >= 3 ? "hnode on" : "hnode"}
+              style={{ animationDelay: `${i * 220}ms` }}
+            >
+              {h}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── main panel ── */
+
 export default function Predict() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<Prediction[] | null>(null);
 
@@ -18,9 +141,15 @@ export default function Predict() {
     const formulas = parse(raw);
     if (formulas.length === 0 || loading) return;
     setLoading(true);
+    setPending(formulas);
     setError(null);
+    const started = Date.now();
     try {
-      setResults(await predict(formulas));
+      const res = await predict(formulas);
+      // Let the pipeline animation finish its story before the results land.
+      const remaining = MIN_SHOW_MS - (Date.now() - started);
+      if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
+      setResults(res);
     } catch {
       setError(
         "Couldn't reach the engine. The free-tier API sleeps when idle — give it ~40 seconds to wake, then try again.",
@@ -81,12 +210,7 @@ export default function Predict() {
 
       {error && <p className="predict__error">{error}</p>}
 
-      {loading && (
-        <div className="predict__loading">
-          featurizing composition → 132 physics descriptors → model
-          <span className="dots" aria-hidden="true" />
-        </div>
-      )}
+      {loading && <PipelineLoading formulas={pending} />}
 
       {!loading && valid.length > 0 && (
         <ol className="results">
@@ -108,7 +232,7 @@ export default function Predict() {
                   </span>
                   <span className="result__val">
                     {r.shear_modulus_gpa}
-                    <em> ± {r.uncertainty_gpa} GPa</em>
+                    <em> GPa · test MAE {r.uncertainty_gpa}</em>
                   </span>
                   <span className="result__badge">{r.evidence_status ?? "SCREENING_ONLY"}</span>
                 </div>
@@ -116,21 +240,23 @@ export default function Predict() {
                   <span className="prop">
                     <label>shear G</label>
                     <b>
-                      {r.shear_modulus_gpa} <i>±{r.uncertainty_gpa}</i>
+                      {r.shear_modulus_gpa} <i>GPa · ±{r.uncertainty_gpa}</i>
                     </b>
                   </span>
                   {r.bulk_modulus_gpa != null && (
                     <span className="prop">
                       <label>bulk K</label>
                       <b>
-                        {r.bulk_modulus_gpa} <i>±{r.bulk_uncertainty_gpa}</i>
+                        {r.bulk_modulus_gpa} <i>GPa · ±{r.bulk_uncertainty_gpa}</i>
                       </b>
                     </span>
                   )}
                   {r.youngs_modulus_gpa != null && (
                     <span className="prop">
                       <label>Young's E</label>
-                      <b>{r.youngs_modulus_gpa}</b>
+                      <b>
+                        {r.youngs_modulus_gpa} <i>GPa</i>
+                      </b>
                     </span>
                   )}
                   {r.poisson_ratio != null && (
@@ -141,12 +267,32 @@ export default function Predict() {
                   )}
                   {r.vickers_hardness_gpa != null && (
                     <span className="prop">
-                      <label>hardness Hᵥ</label>
-                      <b>{r.vickers_hardness_gpa}</b>
+                      <label>est. hardness Hᵥ</label>
+                      <b>
+                        {r.vickers_hardness_gpa} <i>GPa</i>
+                      </b>
+                    </span>
+                  )}
+                  {r.band_gap_ev != null && (
+                    <span className="prop">
+                      <label>band gap</label>
+                      <b>
+                        {r.band_gap_ev} <i>eV · ±{r.band_gap_uncertainty_ev}</i>
+                      </b>
+                    </span>
+                  )}
+                  {r.electronic_class && (
+                    <span className={`prop prop--tag prop--elec`}>
+                      <b>{r.electronic_class}</b>
                     </span>
                   )}
                   {r.character && (
-                    <span className={`prop prop--tag prop--${r.character}`}>
+                    <span
+                      className={`prop prop--tag ${
+                        r.character === "less brittle" ? "prop--ductile" : "prop--brittle"
+                      }`}
+                    >
+                      <label>Pugh</label>
                       <b>{r.character}</b>
                     </span>
                   )}
@@ -165,9 +311,11 @@ export default function Predict() {
 
       {!loading && valid.length > 0 && (
         <p className="predict__note">
-          Ranked by shear modulus, screening grade. Two trained heads (G, K) carry honest
-          test-set uncertainty; Young's E, Poisson ν, hardness, and ductile/brittle character
-          follow from them by exact elasticity relations and Chen–Niu.
+          Composition-only estimates, ranked by shear modulus — a formula does not specify
+          crystal phase, microstructure, or processing. The ± values are each head's held-out
+          test MAE, not material-specific intervals. Hardness is the Chen–Niu intrinsic
+          estimate, not an indentation test; the Pugh tag is a brittleness-tendency indicator,
+          not a measured failure mode.
         </p>
       )}
     </div>

@@ -21,7 +21,10 @@ export type Prediction = {
   poisson_ratio?: number;
   vickers_hardness_gpa?: number;
   pugh_ratio?: number;
-  character?: "ductile" | "brittle";
+  character?: "less brittle" | "more brittle";
+  band_gap_ev?: number;
+  band_gap_uncertainty_ev?: number;
+  electronic_class?: "metallic" | "semiconductor" | "insulator";
   evidence_status?: string;
   note?: string;
 };
