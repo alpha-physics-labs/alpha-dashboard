@@ -92,11 +92,24 @@
         .flow,.stats,.two,.limits,.ask{grid-template-columns:1fr}
       }
       @media print{
-        body{background:#fff;font-size:10pt}
+        body{background:#fff;font-size:9pt;line-height:1.4}
         .wrap{padding:0;max-width:none}
-        .card{break-inside:avoid;box-shadow:none;margin-top:9pt;padding:11pt 13pt}
+        .card{break-inside:avoid;box-shadow:none;margin-top:8pt;padding:10pt 12pt}
         .stats,.flow,.two,.ask,.limits,tr{break-inside:avoid}
-        h1{font-size:30pt}
+        h1{font-size:28pt}
+        h2{font-size:15pt}
+        .tagline{font-size:11pt}
+        .lede{font-size:12pt;margin-top:10pt}
+        /* Print width is narrower than the mobile breakpoint, so restore the grids. */
+        .flow{grid-template-columns:1fr 1fr 1fr}
+        .stats{grid-template-columns:repeat(4,1fr)}
+        .two,.limits{grid-template-columns:1fr 1fr}
+        .ask{grid-template-columns:repeat(3,1fr)}
+        .stats b{font-size:19pt}
+        .stats span,.flow p,.box p,.limit,.ask p{font-size:8pt}
+        .eq{font-size:8.5pt;padding:7pt}
+        table{font-size:8.5pt}
+        .chip{font-size:8.5pt;padding:5pt 8pt}
       }
     </style>
   </head>
