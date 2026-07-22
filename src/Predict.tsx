@@ -96,20 +96,61 @@ export default function Predict() {
             const mid = ((r.shear_modulus_gpa ?? 0) / scaleMax) * 100;
             return (
               <li className="result" key={r.formula}>
-                <span className="result__rank">{r.rank}</span>
-                <span className="result__formula">{r.formula}</span>
-                <span className="result__bar" aria-hidden="true">
-                  <i
-                    className="result__band"
-                    style={{ left: `${Math.max(lo, 0)}%`, width: `${hi - Math.max(lo, 0)}%` }}
-                  />
-                  <i className="result__dot" style={{ left: `${mid}%` }} />
-                </span>
-                <span className="result__val">
-                  {r.shear_modulus_gpa}
-                  <em> ± {r.uncertainty_gpa} GPa</em>
-                </span>
-                <span className="result__badge">{r.evidence_status ?? "SCREENING_ONLY"}</span>
+                <div className="result__main">
+                  <span className="result__rank">{r.rank}</span>
+                  <span className="result__formula">{r.formula}</span>
+                  <span className="result__bar" aria-hidden="true">
+                    <i
+                      className="result__band"
+                      style={{ left: `${Math.max(lo, 0)}%`, width: `${hi - Math.max(lo, 0)}%` }}
+                    />
+                    <i className="result__dot" style={{ left: `${mid}%` }} />
+                  </span>
+                  <span className="result__val">
+                    {r.shear_modulus_gpa}
+                    <em> ± {r.uncertainty_gpa} GPa</em>
+                  </span>
+                  <span className="result__badge">{r.evidence_status ?? "SCREENING_ONLY"}</span>
+                </div>
+                <div className="result__props">
+                  <span className="prop">
+                    <label>shear G</label>
+                    <b>
+                      {r.shear_modulus_gpa} <i>±{r.uncertainty_gpa}</i>
+                    </b>
+                  </span>
+                  {r.bulk_modulus_gpa != null && (
+                    <span className="prop">
+                      <label>bulk K</label>
+                      <b>
+                        {r.bulk_modulus_gpa} <i>±{r.bulk_uncertainty_gpa}</i>
+                      </b>
+                    </span>
+                  )}
+                  {r.youngs_modulus_gpa != null && (
+                    <span className="prop">
+                      <label>Young's E</label>
+                      <b>{r.youngs_modulus_gpa}</b>
+                    </span>
+                  )}
+                  {r.poisson_ratio != null && (
+                    <span className="prop">
+                      <label>Poisson ν</label>
+                      <b>{r.poisson_ratio}</b>
+                    </span>
+                  )}
+                  {r.vickers_hardness_gpa != null && (
+                    <span className="prop">
+                      <label>hardness Hᵥ</label>
+                      <b>{r.vickers_hardness_gpa}</b>
+                    </span>
+                  )}
+                  {r.character && (
+                    <span className={`prop prop--tag prop--${r.character}`}>
+                      <b>{r.character}</b>
+                    </span>
+                  )}
+                </div>
               </li>
             );
           })}
@@ -124,8 +165,9 @@ export default function Predict() {
 
       {!loading && valid.length > 0 && (
         <p className="predict__note">
-          Shear modulus, screening grade. Every value carries the model's honest test-set
-          uncertainty — never a bare number.
+          Ranked by shear modulus, screening grade. Two trained heads (G, K) carry honest
+          test-set uncertainty; Young's E, Poisson ν, hardness, and ductile/brittle character
+          follow from them by exact elasticity relations and Chen–Niu.
         </p>
       )}
     </div>

@@ -15,6 +15,13 @@ export type Prediction = {
   uncertainty_gpa?: number;
   low_gpa?: number;
   high_gpa?: number;
+  bulk_modulus_gpa?: number;
+  bulk_uncertainty_gpa?: number;
+  youngs_modulus_gpa?: number;
+  poisson_ratio?: number;
+  vickers_hardness_gpa?: number;
+  pugh_ratio?: number;
+  character?: "ductile" | "brittle";
   evidence_status?: string;
   note?: string;
 };
@@ -30,6 +37,15 @@ export async function predict(formulas: string[]): Promise<Prediction[]> {
   return data.results as Prediction[];
 }
 
+export type ModelHead = {
+  target: string;
+  unit: string;
+  r2: number;
+  mae: number;
+  n_train: number;
+  n_test: number;
+};
+
 export type ModelCard = {
   target: string;
   unit: string;
@@ -38,6 +54,8 @@ export type ModelCard = {
   n_train: number;
   n_test: number;
   evidence_status: string;
+  heads?: ModelHead[];
+  derived?: string[];
 };
 
 export async function fetchModelCard(): Promise<ModelCard | null> {

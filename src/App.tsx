@@ -12,30 +12,52 @@ const FALLBACK_CARD: ModelCard = {
   n_train: 7799,
   n_test: 1950,
   evidence_status: "SCREENING_ONLY",
+  heads: [
+    { target: "shear_modulus", unit: "GPa", r2: 0.84, mae: 9.3, n_train: 7799, n_test: 1950 },
+    { target: "bulk_modulus", unit: "GPa", r2: 0.879, mae: 13.1, n_train: 7800, n_test: 1951 },
+  ],
+  derived: [
+    "youngs_modulus (isotropic elasticity)",
+    "poisson_ratio (isotropic elasticity)",
+    "vickers_hardness (Chen–Niu 2011 estimate)",
+    "pugh_ratio → ductile/brittle character",
+  ],
 };
 
 const MARKETS = [
   {
-    name: "Sports & impact protection",
-    body: "Helmet liners, pads, footwear. Screen candidate materials for stiffness today; an impact-energy head is next on the same backbone.",
-    market: "~$11.5B protective equipment",
+    name: "Sports science & PPE",
+    body: "Helmet liners, pads, footwear. Stiffness, hardness, and ductile/brittle screening live today; an impact-energy head is next on the same backbone.",
+    market: "~$11.5B protective equipment · warm lead via NFL-helmet research",
     status: "live" as const,
   },
   {
-    name: "Aerospace & mobility",
-    body: "Stiff, light structures from a formula alone — modulus screening before a single coupon is machined.",
+    name: "Auto crash-worthiness & EV safety",
+    body: "Crash structures trade stiffness against ductility — exactly the G, K, and Pugh-ratio screen the engine runs on any candidate alloy or composite.",
+    market: "continuous new-materials testing need",
+    status: "live" as const,
+  },
+  {
+    name: "Aerospace & space infrastructure",
+    body: "Stiff, light structures from a formula alone — Young's modulus and Poisson's ratio before a single coupon is machined.",
     market: "structures & composites",
     status: "live" as const,
   },
   {
-    name: "Energy & electronics",
-    body: "Thermal-conductivity and band-gap heads share the featurization and physics core. New property, same engine.",
-    market: "batteries · semiconductors",
+    name: "Industrial tooling",
+    body: "Cutting and forming tools live on the hardness–toughness frontier. The Chen–Niu hardness estimate ranks candidates before procurement.",
+    market: "wear parts · dies · inserts",
+    status: "live" as const,
+  },
+  {
+    name: "Textiles & performance gear",
+    body: "Rope, fabric, and gear stress-testing markets. A different property family — a scoping conversation, honestly labeled.",
+    market: "exploratory",
     status: "planned" as const,
   },
   {
     name: "Defense",
-    body: "Armor-material screening stays strictly screening-grade until ballistic validation. A later vertical, entered with evidence.",
+    body: "Armor-material screening stays strictly screening-grade until ballistic validation. A later vertical, entered with evidence and a CRADA.",
     market: "later vertical",
     status: "planned" as const,
   },
@@ -94,8 +116,8 @@ export default function App() {
             <span>Get physics back.</span>
           </h1>
           <p className="hero__sub">
-            Any chemical formula becomes 132 physics descriptors and a property prediction
-            with honest uncertainty — in about a second.
+            Any chemical formula becomes 132 physics descriptors, two trained model heads, and
+            six material properties with honest uncertainty — in about a second.
           </p>
           <Predict />
         </section>
@@ -168,20 +190,29 @@ export default function App() {
           </div>
           <dl className="card">
             <div>
-              <dt>Target</dt>
+              <dt>Trained heads</dt>
               <dd>
-                {card.target} · {card.unit}
+                {(card.heads ?? []).map((h) => (
+                  <span className="card__head" key={h.target}>
+                    <code>{h.target}</code> — R² {h.r2} · MAE {h.mae} {h.unit} on{" "}
+                    {h.n_test?.toLocaleString()} held-out materials
+                  </span>
+                ))}
+              </dd>
+            </div>
+            <div>
+              <dt>Derived by physics</dt>
+              <dd>
+                {(card.derived ?? []).map((d) => (
+                  <span className="card__head" key={d}>
+                    {d}
+                  </span>
+                ))}
               </dd>
             </div>
             <div>
               <dt>Training set</dt>
               <dd>{card.n_train.toLocaleString()} materials, public data</dd>
-            </div>
-            <div>
-              <dt>Held-out test</dt>
-              <dd>
-                {card.n_test.toLocaleString()} materials · R² {card.r2} · MAE {card.mae_gpa} {card.unit}
-              </dd>
             </div>
             <div>
               <dt>Evidence status</dt>
