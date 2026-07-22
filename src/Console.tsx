@@ -756,13 +756,24 @@ export default function Console() {
                 <div className="detail__tags">
                   {sel.domain && (
                     <span
-                      className={`rrow__tag ${sel.domain === "in_domain" ? "rrow__tag--in" : "rrow__tag--out"}`}
+                      className={`rrow__tag ${
+                        sel.domain === "in_domain"
+                          ? "rrow__tag--in"
+                          : sel.domain === "out_of_scope"
+                            ? "rrow__tag--stop"
+                            : "rrow__tag--out"
+                      }`}
                     >
-                      {sel.domain === "in_domain" ? "In domain" : "Extrapolating"}
+                      {sel.domain === "in_domain"
+                        ? "In domain"
+                        : sel.domain === "out_of_scope"
+                          ? "Out of scope"
+                          : "Extrapolating"}
                     </span>
                   )}
                   <span className="rrow__badge">Screening only</span>
                 </div>
+                {sel.scope_note && <p className="detail__scope">{sel.scope_note}</p>}
                 <div className="detail__hero">
                   <span className="detail__heroVal">
                     {sel.shear_modulus_gpa} <i>GPa</i>

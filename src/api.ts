@@ -28,7 +28,8 @@ export type Prediction = {
   shear_conformal90_gpa?: number;
   bulk_conformal90_gpa?: number;
   band_gap_conformal90_ev?: number;
-  domain?: "in_domain" | "extrapolating";
+  domain?: "in_domain" | "extrapolating" | "out_of_scope";
+  scope_note?: string;
   neighbors?: { formula: string; shear_modulus_gpa: number }[];
   density_est_gcc?: number;
   sound_speed_shear_ms?: number;

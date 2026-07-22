@@ -827,6 +827,19 @@ button {
   color: var(--warn);
   background: var(--warn-soft);
 }
+.rrow__tag--stop {
+  color: #fff;
+  background: #b3261e;
+}
+.detail__scope {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fdecea;
+  color: #8c1d18;
+  font-size: 14px;
+  line-height: 1.5;
+}
 .rrow__badge {
   margin-left: auto;
   font-family: var(--font-sans);
