@@ -374,6 +374,122 @@ function PanelSizing({ selected }: { selected: Prediction }) {
   );
 }
 
+/* ────────────────────────── threat energy screen ──────────────────────────
+   Everything here is exact arithmetic from the projectile and the predicted
+   density. It is deliberately NOT a V50 prediction: ballistic limit depends on
+   strength and fracture, which we do not predict. These are the comparative
+   indicators an engineer uses to decide what is worth testing. */
+
+const THREATS = [
+  { name: "9 mm FMJ", mass_g: 8.0, v_ms: 398, note: "NIJ Level IIIA reference" },
+  { name: ".44 Magnum SJHP", mass_g: 15.6, v_ms: 436, note: "NIJ Level IIIA reference" },
+  { name: "7.62×39 mild steel core", mass_g: 7.9, v_ms: 715, note: "rifle threat" },
+  { name: "5.56 M193", mass_g: 3.56, v_ms: 990, note: "high velocity, low mass" },
+  { name: "7.62×51 M80 ball", mass_g: 9.6, v_ms: 847, note: "NIJ Level III reference" },
+];
+
+function ThreatScreen({ selected }: { selected: Prediction }) {
+  const [threatIdx, setThreatIdx] = useState(4);
+  const [thickness, setThickness] = useState(10);
+  const rho = selected.density_est_gcc;
+  const vLong = selected.sound_speed_long_ms;
+  const z = selected.acoustic_impedance_mrayl;
+  if (rho == null) return null;
+
+  const t = THREATS[threatIdx];
+  const ke = 0.5 * (t.mass_g / 1000) * t.v_ms ** 2; // joules
+  const areal = rho * thickness; // kg/m²
+  const kePerAreal = ke / areal; // J per kg/m²
+  // How long a pressure wave takes to cross the plate and return, in microseconds.
+  const transit = vLong ? (2 * (thickness / 1000)) / vLong / 1e-6 : null;
+
+  return (
+    <section className="detail__sec">
+      <h3>Threat energy screen</h3>
+      <div className="sizing">
+        <div className="threat__row">
+          <label className="sizing__ctl">
+            <span>Threat</span>
+            <select
+              className="threat__select"
+              value={threatIdx}
+              onChange={(e) => setThreatIdx(Number(e.target.value))}
+            >
+              {THREATS.map((x, i) => (
+                <option key={x.name} value={i}>
+                  {x.name} — {x.mass_g} g at {x.v_ms} m/s
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="sizing__ctl">
+            <span>Plate thickness</span>
+            <input
+              type="range"
+              min={2}
+              max={30}
+              step={1}
+              value={thickness}
+              onChange={(e) => setThickness(Number(e.target.value))}
+            />
+            <b>{thickness} mm</b>
+          </label>
+        </div>
+        <p className="sizing__note">
+          <b>This is not a V50 prediction.</b> Ballistic limit depends on strength and
+          fracture behaviour, which we do not predict. These are the exact energy and wave
+          quantities an engineer compares when deciding which candidates are worth a shot.
+        </p>
+      </div>
+      <div className="pgrid">
+        <Cell
+          name="Projectile energy"
+          value={Math.round(ke)}
+          unit="J"
+          caption={`${t.mass_g} g at ${t.v_ms} m/s. ${t.note}`}
+        />
+        <Cell
+          name="Plate areal density"
+          value={Number(areal.toFixed(1))}
+          unit="kg/m²"
+          caption={`A ${thickness} mm panel of this material`}
+        />
+        <Cell
+          name="Energy per unit weight"
+          value={Number(kePerAreal.toFixed(1))}
+          unit="J per kg/m²"
+          caption="Threat energy the plate must handle for every kg/m² it costs you. Lower is better."
+          tone="accent"
+        />
+        {z != null && (
+          <Cell
+            name="Shock impedance"
+            value={z}
+            unit="MRayl"
+            caption="Governs how much of the impact shock transmits rather than reflects. Used to match layers."
+          />
+        )}
+        {transit != null && (
+          <Cell
+            name="Wave transit, there and back"
+            value={Number(transit.toFixed(2))}
+            unit="µs"
+            caption="How long a pressure wave takes to cross the plate and return. Sets how fast the plate can respond."
+          />
+        )}
+        {selected.vickers_hardness_gpa != null && (
+          <Cell
+            name="Estimated hardness"
+            value={selected.vickers_hardness_gpa}
+            unit="GPa"
+            caption="Higher hardness tends to blunt and erode a projectile. An indicator, not a penetration model."
+          />
+        )}
+      </div>
+    </section>
+  );
+}
+
 /* ────────────────────────── comparison table ────────────────────────── */
 
 type Col = {
@@ -966,6 +1082,8 @@ export default function Console() {
               </div>
 
               <PanelSizing selected={sel} />
+
+              <ThreatScreen selected={sel} />
 
               <CompareTable batch={valid} selected={sel} onSelect={setSelected} />
 

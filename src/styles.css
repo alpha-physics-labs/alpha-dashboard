@@ -2207,6 +2207,28 @@ button {
   font-size: 15px;
   min-width: 60px;
 }
+.threat__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+}
+.threat__select {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 7px 10px;
+  cursor: pointer;
+}
+.threat__select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.sizing__note b {
+  color: var(--ink);
+}
 .sizing__note {
   font-size: 13px;
   color: var(--ink-3);
