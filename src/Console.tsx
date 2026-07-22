@@ -140,12 +140,9 @@ const REFS = [
   { name: "Polycarbonate", e: 2.4, rho: 1.2 },
   { name: "CFRP", e: 70, rho: 1.6 },
   { name: "Aluminum", e: 69, rho: 2.7 },
-  { name: "SiC", e: 410, rho: 3.21 },
   { name: "Diamond", e: 1050, rho: 3.52 },
-  { name: "Alumina", e: 390, rho: 3.95 },
   { name: "Titanium", e: 114, rho: 4.51 },
   { name: "Steel", e: 200, rho: 7.85 },
-  { name: "Copper", e: 117, rho: 8.96 },
 ];
 
 const AW = 560;
@@ -196,8 +193,8 @@ function Ashby({ batch, selected }: { batch: Prediction[]; selected: Prediction 
         </text>
         {REFS.map((m) => (
           <g key={m.name}>
-            <circle cx={ax(m.rho)} cy={ay(m.e)} r={4} className="spt spt--ref" />
-            <text x={ax(m.rho) + 7} y={ay(m.e) + 4} className="slabel">
+            <circle cx={ax(m.rho)} cy={ay(m.e)} r={3} className="spt spt--ref" />
+            <text x={ax(m.rho) + 6} y={ay(m.e) + 3.5} className="slabel slabel--ref">
               {m.name}
             </text>
           </g>
@@ -209,16 +206,18 @@ function Ashby({ batch, selected }: { batch: Prediction[]; selected: Prediction 
               <circle
                 cx={ax(r.density_est_gcc!)}
                 cy={ay(r.youngs_modulus_gpa!)}
-                r={isSel ? 7 : 5}
+                r={isSel ? 7 : 4.5}
                 className={isSel ? "spt spt--sel" : "spt spt--batch"}
               />
-              <text
-                x={ax(r.density_est_gcc!) + 9}
-                y={ay(r.youngs_modulus_gpa!) - 6}
-                className={isSel ? "slabel slabel--sel" : "slabel slabel--batch"}
-              >
-                {r.formula}
-              </text>
+              {isSel && (
+                <text
+                  x={ax(r.density_est_gcc!) + 10}
+                  y={ay(r.youngs_modulus_gpa!) - 8}
+                  className="slabel slabel--sel"
+                >
+                  {r.formula}
+                </text>
+              )}
             </g>
           );
         })}
@@ -229,90 +228,61 @@ function Ashby({ batch, selected }: { batch: Prediction[]; selected: Prediction 
 
 /* Property profile: five normalized axes. */
 
-const PAXES = [
-  { key: "stiff", label: "Stiffness" },
-  { key: "hard", label: "Hardness" },
-  { key: "light", label: "Lightness" },
-  { key: "imped", label: "Impedance" },
-  { key: "gap", label: "Band gap" },
-] as const;
-
-function profileOf(r: Prediction): number[] {
-  const clamp = (v: number) => Math.max(0.03, Math.min(1, v));
-  return [
-    clamp((r.youngs_modulus_gpa ?? 0) / 700),
-    clamp((r.vickers_hardness_gpa ?? 0) / 40),
-    clamp(2 / (r.density_est_gcc ?? 20)),
-    clamp((r.acoustic_impedance_mrayl ?? 0) / 110),
-    clamp((r.band_gap_ev ?? 0) / 6),
-  ];
-}
-
-const RW = 340;
-const RC = RW / 2;
-const RR = 110;
-
-function radarPoints(values: number[], scale = 1): string {
-  return values
-    .map((v, i) => {
-      const angle = (Math.PI * 2 * i) / values.length - Math.PI / 2;
-      const r = RR * v * scale;
-      return `${RC + r * Math.cos(angle)},${RC + r * Math.sin(angle)}`;
-    })
-    .join(" ");
-}
-
 function Profile({ selected }: { selected: Prediction }) {
-  const vals = profileOf(selected);
+  const clamp = (v: number) => Math.max(0.03, Math.min(1, v));
+  const bars = [
+    {
+      label: "Stiffness",
+      pct: clamp((selected.youngs_modulus_gpa ?? 0) / 700),
+      value: `${selected.youngs_modulus_gpa ?? "–"} GPa`,
+      note: "of diamond-class 700",
+    },
+    {
+      label: "Hardness",
+      pct: clamp((selected.vickers_hardness_gpa ?? 0) / 40),
+      value: `${selected.vickers_hardness_gpa ?? "–"} GPa`,
+      note: "of superhard 40",
+    },
+    {
+      label: "Lightness",
+      pct: clamp(2 / (selected.density_est_gcc ?? 20)),
+      value: `${selected.density_est_gcc ?? "–"} g/cm³`,
+      note: "lighter fills more",
+    },
+    {
+      label: "Impedance",
+      pct: clamp((selected.acoustic_impedance_mrayl ?? 0) / 110),
+      value: `${selected.acoustic_impedance_mrayl ?? "–"} MRayl`,
+      note: "of tungsten-carbide 110",
+    },
+    {
+      label: "Band gap",
+      pct: clamp((selected.band_gap_ev ?? 0) / 6),
+      value: `${selected.band_gap_ev ?? "–"} eV`,
+      note: "of wide-gap 6",
+    },
+  ];
   return (
     <figure className="panel">
       <figcaption className="panel__cap">
         <b>Property profile</b>
         <span>
-          Five properties on one shape, each scaled to a strong engineering material. A bigger
-          footprint means a stronger all-round candidate.
+          Each property against a benchmark strong material, so a full bar means best in class.
         </span>
       </figcaption>
-      <svg viewBox={`0 0 ${RW} ${RW}`} className="panel__svg panel__svg--radar" role="img" aria-label="Property profile radar">
-        {[0.25, 0.5, 0.75, 1].map((s) => (
-          <polygon key={s} points={radarPoints([1, 1, 1, 1, 1], s)} className="rgrid" />
+      <div className="pbars">
+        {bars.map((b) => (
+          <div className="pbar" key={b.label}>
+            <span className="pbar__name">{b.label}</span>
+            <span className="pbar__track">
+              <i style={{ width: `${b.pct * 100}%` }} />
+            </span>
+            <span className="pbar__val">
+              {b.value} <i>{b.note}</i>
+            </span>
+          </div>
         ))}
-        {PAXES.map((a, i) => {
-          const angle = (Math.PI * 2 * i) / PAXES.length - Math.PI / 2;
-          return (
-            <g key={a.key}>
-              <line
-                x1={RC}
-                y1={RC}
-                x2={RC + RR * Math.cos(angle)}
-                y2={RC + RR * Math.sin(angle)}
-                className="rgrid"
-              />
-              <text
-                x={RC + (RR + 18) * Math.cos(angle)}
-                y={RC + (RR + 18) * Math.sin(angle) + 4}
-                className="slabel"
-                textAnchor="middle"
-              >
-                {a.label}
-              </text>
-            </g>
-          );
-        })}
-        <polygon points={radarPoints(vals)} className="rshape" />
-        {vals.map((v, i) => {
-          const angle = (Math.PI * 2 * i) / vals.length - Math.PI / 2;
-          return (
-            <circle
-              key={i}
-              cx={RC + RR * v * Math.cos(angle)}
-              cy={RC + RR * v * Math.sin(angle)}
-              r={3.5}
-              className="spt spt--sel"
-            />
-          );
-        })}
-      </svg>
+      </div>
     </figure>
   );
 }
@@ -366,49 +336,68 @@ function CompareTable({
 }) {
   return (
     <section className="detail__sec">
-      <h3>Comparison table</h3>
+      <h3>Compare the batch</h3>
       <p className="ctable__cap">
-        Every screened material side by side. Deeper blue means a larger value in that column.
-        Click a row to inspect it.
+        Properties as rows, materials as columns. The small bar under each number shows it
+        against the best in the row. Click a column to inspect that material.
       </p>
       <div className="ctable__wrap">
-        <table className="ctable">
+        <table className="matrix">
           <thead>
             <tr>
-              <th>Material</th>
-              {COLS.map((c) => (
-                <th key={c.label}>
-                  {c.label}
-                  {c.unit && <i> {c.unit}</i>}
+              <th />
+              {batch.map((r) => (
+                <th
+                  key={r.formula}
+                  className={r.formula === selected.formula ? "is-sel" : ""}
+                  onClick={() => onSelect(r.formula)}
+                >
+                  {r.formula}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {batch.map((r) => (
-              <tr
-                key={r.formula}
-                className={r.formula === selected.formula ? "is-sel" : ""}
-                onClick={() => onSelect(r.formula)}
-              >
-                <td>{r.formula}</td>
-                {COLS.map((c) => {
+            {COLS.map((c) => {
+              const rowMax = Math.max(
+                ...batch.map((r) => {
                   const v = c.get(r);
-                  const tint =
-                    typeof v === "number" && c.max
-                      ? Math.min(Math.abs(v) / c.max, 1) * 0.16
-                      : 0;
-                  return (
-                    <td
-                      key={c.label}
-                      style={tint ? { background: `rgba(10, 99, 216, ${tint})` } : undefined}
-                    >
-                      {v == null ? "–" : typeof v === "number" ? v.toLocaleString() : v}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+                  return typeof v === "number" ? Math.abs(v) : 0;
+                }),
+                1e-9,
+              );
+              return (
+                <tr key={c.label}>
+                  <th>
+                    {c.label}
+                    {c.unit && <i> {c.unit}</i>}
+                  </th>
+                  {batch.map((r) => {
+                    const v = c.get(r);
+                    return (
+                      <td
+                        key={r.formula}
+                        className={r.formula === selected.formula ? "is-sel" : ""}
+                        onClick={() => onSelect(r.formula)}
+                      >
+                        {v == null ? (
+                          "–"
+                        ) : typeof v === "number" ? (
+                          <>
+                            <b>{v.toLocaleString()}</b>
+                            <i className="matrix__bar" aria-hidden="true">
+                              <b style={{ width: `${(Math.abs(v) / rowMax) * 100}%` }} />
+                            </i>
+                          </>
+                        ) : (
+                          <span className="matrix__tag">{v}</span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
