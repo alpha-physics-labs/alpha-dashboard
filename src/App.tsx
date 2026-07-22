@@ -82,8 +82,22 @@ export default function App() {
     fetchModelCard().then((c) => c && setCard(c));
   }, []);
 
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => e.isIntersecting && e.target.classList.add("in")),
+      { threshold: 0.1 },
+    );
+    document.querySelectorAll(".sec").forEach((s) => obs.observe(s));
+    return () => obs.disconnect();
+  }, []);
+
   return (
     <div className="page">
+      <div className="bg" aria-hidden="true">
+        <i />
+        <i />
+      </div>
       <header className="top">
         <div className="top__brand">
           <img
@@ -208,7 +222,47 @@ export default function App() {
 
         <section className="sec">
           <div className="sec__head">
-            <p className="sec__label">03 · One engine, many markets</p>
+            <p className="sec__label">03 · How you use it</p>
+            <h2 className="sec__h">Test five right materials instead of fifty guesses.</h2>
+          </div>
+          <div className="steps">
+            <article>
+              <span>1</span>
+              <h4>Paste your candidates</h4>
+              <p>
+                Up to 25 formulas at a time, straight from a brainstorm, a paper, or a supplier
+                catalog. No account, no setup, answers in seconds.
+              </p>
+            </article>
+            <article>
+              <span>2</span>
+              <h4>Read the physics</h4>
+              <p>
+                Ranked stiffness with calibrated ranges, hardness and brittleness indicators,
+                impedance, density, electronic class. Every value says how sure it is and shows
+                the measured materials it learned from.
+              </p>
+            </article>
+            <article>
+              <span>3</span>
+              <h4>Send only the best to the lab</h4>
+              <p>
+                Testing stays essential. Screening just makes every test dollar land on a
+                candidate that deserves it.
+              </p>
+            </article>
+          </div>
+          <p className="steps__money">
+            A single material test campaign runs <b>$5,000 to $50,000</b> and takes{" "}
+            <b>4 to 12 weeks</b>. Cutting ten weak candidates before the lab saves roughly{" "}
+            <b>$100,000 and a year</b> of serial testing per selection project. That is the
+            product: fewer wasted test cycles, faster time to shortlist.
+          </p>
+        </section>
+
+        <section className="sec">
+          <div className="sec__head">
+            <p className="sec__label">04 · One engine, many markets</p>
             <h2 className="sec__h">One engine. A property head per market.</h2>
             <p className="sec__sub">
               Several materials markets share the same property foundations. Each application
@@ -234,7 +288,7 @@ export default function App() {
 
         <section className="sec">
           <div className="sec__head">
-            <p className="sec__label">04 · Model card</p>
+            <p className="sec__label">05 · Model card</p>
             <h2 className="sec__h">What this is, and what it is not.</h2>
           </div>
           <dl className="card">

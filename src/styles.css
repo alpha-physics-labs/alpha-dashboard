@@ -72,6 +72,44 @@ button {
   padding: 0 clamp(18px, 4vw, 40px) 64px;
 }
 
+/* ambient background */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bg i {
+  position: absolute;
+  width: 62vmax;
+  height: 62vmax;
+  border-radius: 50%;
+  filter: blur(90px);
+}
+.bg i:nth-child(1) {
+  background: radial-gradient(circle, rgba(10, 99, 216, 0.13), transparent 62%);
+  top: -22vmax;
+  right: -16vmax;
+  animation: drift1 19s ease-in-out infinite alternate;
+}
+.bg i:nth-child(2) {
+  background: radial-gradient(circle, rgba(31, 138, 109, 0.1), transparent 62%);
+  bottom: -26vmax;
+  left: -18vmax;
+  animation: drift2 24s ease-in-out infinite alternate;
+}
+@keyframes drift1 {
+  to {
+    transform: translate(-7vmax, 6vmax) scale(1.08);
+  }
+}
+@keyframes drift2 {
+  to {
+    transform: translate(6vmax, -5vmax) scale(1.06);
+  }
+}
+
 /* ── top bar ─────────────────────────────────────── */
 .top {
   display: flex;
@@ -150,7 +188,15 @@ button {
 /* ── sections ────────────────────────────────────── */
 .sec {
   padding: clamp(52px, 8vh, 84px) 0 0;
-  animation: rise 0.7s var(--ease) both;
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.85s var(--ease),
+    transform 0.85s var(--ease);
+}
+.sec.in {
+  opacity: 1;
+  transform: none;
 }
 @keyframes rise {
   from {
@@ -197,7 +243,19 @@ button {
   animation: lineIn 0.9s var(--ease) both;
 }
 .wline--accent {
-  color: var(--accent);
+  background: linear-gradient(100deg, #0a63d8 20%, #1f8a6d 50%, #0a63d8 80%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation:
+    lineIn 0.9s var(--ease) both,
+    shimmer 7s linear infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -220% 0;
+  }
 }
 @keyframes lineIn {
   from {
@@ -209,6 +267,65 @@ button {
     opacity: 1;
     transform: translateY(0);
     clip-path: inset(0 0 -10% 0);
+  }
+}
+
+/* how you use it */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.steps article {
+  position: relative;
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 22px 22px 19px;
+  overflow: hidden;
+  transition:
+    transform 0.3s var(--ease),
+    box-shadow 0.3s var(--ease);
+}
+.steps article:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+.steps span {
+  display: block;
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(160deg, var(--accent), #1f8a6d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.steps h4 {
+  margin-top: 12px;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.steps p {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+.steps__money {
+  margin-top: 14px;
+  font-size: 15px;
+  color: var(--ink-2);
+  max-width: 72ch;
+}
+.steps__money b {
+  color: var(--accent);
+}
+@media (max-width: 860px) {
+  .steps {
+    grid-template-columns: 1fr;
   }
 }
 
