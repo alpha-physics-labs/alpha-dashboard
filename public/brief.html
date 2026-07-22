@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ALPHA — One page</title>
+    <meta name="description" content="Physics-informed material intelligence. Predict what a material will do before anyone has made it." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Basic&family=Noto+Serif+Display:wght@400;500&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      @page { size: A4; margin: 12mm; }
+      *{margin:0;padding:0;box-sizing:border-box}
+      :root{
+        --ink:#16181d;--ink2:#4a4e57;--ink3:#868a93;--line:#e4e5ea;--bg:#f5f5f7;
+        --accent:#0a63d8;--accent-soft:#eaf2fd;--good:#1d8a57;--good-soft:#e9f6ef;
+        --warn:#b25e0b;--warn-soft:#fbf1e4;
+        --sans:"Basic",system-ui,sans-serif;--serif:"Noto Serif Display",Georgia,serif;
+        --mono:"Spline Sans Mono",monospace;
+      }
+      body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:14px;line-height:1.45}
+      .wrap{max-width:1000px;margin:0 auto;padding:34px 22px 60px}
+      .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-top:14px}
+      h1{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5vw,50px);line-height:1.02}
+      .tagline{font-size:clamp(15px,2vw,18px);color:var(--ink2);margin-top:8px;max-width:60ch}
+      .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink3);margin-top:14px}
+      h2{font-family:var(--serif);font-weight:400;font-size:22px}
+      h2 .n{font-family:var(--mono);font-size:12px;color:var(--accent);vertical-align:6px;margin-right:8px}
+      h3{font-size:14.5px;font-weight:600}
+      p{color:var(--ink2);margin-top:6px}
+      .lede{font-family:var(--serif);font-size:19px;line-height:1.35;color:var(--ink);
+            border-left:3px solid var(--accent);padding-left:16px;margin-top:18px}
+
+      /* flow of three */
+      .flow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+      .flow div{background:var(--bg);border-radius:9px;padding:14px 15px}
+      .flow b{display:block;font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.05em}
+      .flow h3{margin-top:5px}
+      .flow p{font-size:13px;margin-top:4px}
+      .eq{font-family:var(--mono);font-size:12px;background:var(--accent-soft);color:var(--ink);
+          border-radius:8px;padding:11px 13px;margin-top:11px;text-align:center;overflow-x:auto}
+
+      /* stats */
+      .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+      .stats div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:15px 16px}
+      .stats b{display:block;font-family:var(--serif);font-size:30px;line-height:1}
+      .stats span{display:block;font-size:12px;color:var(--ink3);margin-top:5px;line-height:1.35}
+      .stats .hi{background:var(--accent);border-color:var(--accent)}
+      .stats .hi b,.stats .hi span{color:#fff}
+      .stats .hi span{opacity:.9}
+
+      /* property chips */
+      .props{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+      .chip{background:var(--bg);border-radius:8px;padding:8px 12px;font-size:13px}
+      .chip b{font-family:var(--mono);display:block;font-size:11px;color:var(--accent)}
+      .chip--learned{background:var(--accent-soft)}
+
+      /* two col */
+      .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+      .box{background:var(--bg);border-radius:9px;padding:14px 16px}
+      .box p{font-size:13px}
+
+      /* table */
+      table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+      th{text-align:left;font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+         color:var(--ink3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+      td{padding:8px;border-bottom:1px solid var(--line);color:var(--ink2);vertical-align:top}
+      td:first-child{font-weight:600;color:var(--ink);white-space:nowrap}
+      tr:last-child td{border-bottom:none}
+      .yes{color:var(--good);font-weight:600}
+      .no{color:var(--ink3)}
+      .row-us td{background:var(--accent-soft)}
+
+      /* limits */
+      .limits{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+      .limit{background:var(--bg);border-radius:8px;padding:11px 13px;font-size:13px;color:var(--ink2)}
+      .limit b{color:var(--ink);display:block}
+
+      .ask{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+      .ask div{border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:14px 16px}
+      .ask b{display:block;font-size:14.5px}
+      .ask p{font-size:13px;margin-top:4px}
+
+      .tag{font-size:11px;font-weight:600;border-radius:5px;padding:2px 7px;white-space:nowrap}
+      .tag--live{color:var(--good);background:var(--good-soft)}
+      .tag--next{color:var(--warn);background:var(--warn-soft)}
+      .foot{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);
+            font-size:12px;color:var(--ink3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+      .foot a{color:var(--accent);text-decoration:none;font-weight:600}
+
+      @media (max-width:820px){
+        .flow,.stats,.two,.limits,.ask{grid-template-columns:1fr}
+      }
+      @media print{
+        body{background:#fff;font-size:10pt}
+        .wrap{padding:0;max-width:none}
+        .card{break-inside:avoid;box-shadow:none;margin-top:9pt;padding:11pt 13pt}
+        .stats,.flow,.two,.ask,.limits,tr{break-inside:avoid}
+        h1{font-size:30pt}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>ALPHA</h1>
+      <p class="tagline">
+        Physics-informed material intelligence. Predict what a material will do before anyone has made it.
+      </p>
+      <p class="kicker">DIU COMMERCIALIZATION FELLOWSHIP · BUILD DAY · 22 JULY 2026 · PAUDEL, ARYAL, DICKENS</p>
+
+      <p class="lede">
+        An engineer can list forty candidate materials in an afternoon. Each must be made,
+        machined, and tested before anyone knows if it works. The budget covers a handful.
+        <strong>ALPHA says which handful.</strong>
+      </p>
+
+      <div class="card">
+        <h2><span class="n">01</span>What it does</h2>
+        <p>Type a chemical formula. One second later:</p>
+        <div class="props">
+          <span class="chip chip--learned"><b>learned</b>Shear modulus G</span>
+          <span class="chip chip--learned"><b>learned</b>Bulk modulus K</span>
+          <span class="chip chip--learned"><b>learned</b>Band gap</span>
+          <span class="chip"><b>physics</b>Young's modulus E</span>
+          <span class="chip"><b>physics</b>Poisson's ratio</span>
+          <span class="chip"><b>physics</b>Hardness</span>
+          <span class="chip"><b>physics</b>Brittleness tendency</span>
+          <span class="chip"><b>physics</b>Density</span>
+          <span class="chip"><b>physics</b>Wave speeds</span>
+          <span class="chip"><b>physics</b>Shock impedance</span>
+          <span class="chip"><b>physics</b>Panel areal density</span>
+          <span class="chip"><b>physics</b>Electronic class</span>
+        </div>
+        <p style="margin-top:12px">
+          Every value carries a calibrated 90% range, a flag when the engine is extrapolating, and
+          the measured materials it learned from. <strong>It works on compositions that exist in no
+          database at all.</strong>
+        </p>
+      </div>
+
+      <div class="card">
+        <h2><span class="n">02</span>Where the physics is</h2>
+        <p>The model never invents physics. It only corrects it.</p>
+        <div class="flow">
+          <div>
+            <b>INPUT</b>
+            <h3>Physical quantities</h3>
+            <p>132 measurable element properties: electronegativity, atomic volume, valence
+            electrons, melting point. No black box.</p>
+          </div>
+          <div>
+            <b>LEARNING</b>
+            <h3>A law, then a correction</h3>
+            <p>A scaling law answers first. The network learns only the gap between law and
+            reality, and is penalised if it starts believing something physically absurd.</p>
+          </div>
+          <div>
+            <b>OUTPUT</b>
+            <h3>Exact equations</h3>
+            <p>Only two numbers are learned. The rest is closed-form classical physics.</p>
+          </div>
+        </div>
+        <div class="eq">log G = c₀ + a₁·log(VED) + a₂·log(COH) − b₁·ionicity − a₃·log(r<sub>cov</sub>)</div>
+        <div class="eq">E = 9KG/(3K+G) &nbsp; ν = (3K−2G)/2(3K+G) &nbsp; v = √(G/ρ) &nbsp; Z = ρ·v</div>
+        <div class="box" style="margin-top:11px;background:var(--good-soft)">
+          <p style="color:var(--ink)">
+            <strong>Proof in one test:</strong> type copper. We return Young's modulus 111 GPa and
+            Poisson's ratio 0.358. Textbook says 117 and 0.34. <strong>Neither was ever trained
+            on</strong> — both came from two predictions and equations Poisson wrote in the 1820s.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="n">03</span>Why physics is commercial, not academic</h2>
+        <div class="stats">
+          <div class="hi"><b>−26%</b><span>error vs data-only learning at 20–80 training samples</span></div>
+          <div><b>90–91%</b><span>verified coverage of our calibrated 90% ranges</span></div>
+          <div><b>9,749</b><span>materials merged from public sources</span></div>
+          <div><b>3</b><span>trained property heads, two added on build day</span></div>
+        </div>
+        <p style="margin-top:12px">
+          Same network, same features, trained twice — with physics and without. With plenty of data
+          they tie. At <strong>20 to 80 samples</strong> physics wins by up to 26%. That range is the
+          size of a real customer test campaign: a helmet company has thirty impact tests, not thirty
+          thousand. <strong>Physics gets us to the cold start. Customer data becomes the moat.</strong>
+        </p>
+      </div>
+
+      <div class="card">
+        <h2><span class="n">04</span>Built on build day</h2>
+        <div class="two">
+          <div class="box"><h3>Live public console</h3><p>The engine stopped being research code on one laptop and became a product anyone can use without us in the room.</p></div>
+          <div class="box"><h3>Deployed inference API</h3><p>Predictions are a URL, not a terminal session.</p></div>
+          <div class="box"><h3>Bulk modulus head</h3><p>R² 0.878. Unlocked Young's modulus, Poisson's ratio, hardness and ductility through exact physics.</p></div>
+          <div class="box"><h3>Band gap head</h3><p>Trained today on 4,604 measured gaps. A new market's property in one day — the platform claim proven, not promised.</p></div>
+          <div class="box"><h3>Calibrated uncertainty</h3><p>Conformal 90% intervals, verified at 90–91% actual coverage on unseen data.</p></div>
+          <div class="box"><h3>Out-of-distribution testing</h3><p>Remove a whole chemical family and error goes 9.3 → 32.5 GPa. Published on the product, not hidden.</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="n">05</span>How we are different</h2>
+        <p>Every alternative needs the material to already exist — as a product, a database record, or your own data.</p>
+        <table>
+          <tr><th>Tool</th><th>What it is</th><th>Novel composition, zero data?</th></tr>
+          <tr><td>Ansys Granta</td><td>System of record for materials that exist. You enter values you measured. Its ML runs on your enterprise data.</td><td class="no">No</td></tr>
+          <tr><td>Citrine</td><td>Closest real competitor. Sparse-data learning. Cold start works by designing experiments — their case study says five months.</td><td class="no">Months of experiments</td></tr>
+          <tr><td>Materials Project</td><td>Free, excellent, but only crystals someone already computed.</td><td class="no">No</td></tr>
+          <tr><td>DFT simulation</td><td>Rigorous physics. Needs a known structure, a specialist, hours per material.</td><td class="no">Not at screening speed</td></tr>
+          <tr class="row-us"><td>ALPHA</td><td>Physics-informed prediction from composition alone, with calibrated confidence and honest scope flags.</td><td class="yes">Yes, in one second</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2><span class="n">06</span>Next</h2>
+        <div class="two">
+          <div class="box">
+            <h3>Structure-aware models <span class="tag tag--next">Needs one GPU</span></h3>
+            <p>We already hold <strong>10,987 crystal structures</strong> whose 3D arrangement we
+            currently discard, keeping only the formula. A graph network on them is our biggest
+            available accuracy gain — and it answers the criticism that a formula cannot tell one
+            crystal phase from another.</p>
+          </div>
+          <div class="box">
+            <h3>Impact &amp; ballistic heads <span class="tag tag--next">Needs partner data</span></h3>
+            <p>Impact energy absorption, then V50 and back face deformation against areal density.
+            We start from an established analytical armor model as the physics prior and learn the
+            correction from flat plate tests — the recipe already proven on stiffness.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="n">07</span>What we are honest about</h2>
+        <div class="limits">
+          <div class="limit"><b>Composition only</b>A formula does not specify crystal phase, microstructure, or processing.</div>
+          <div class="limit"><b>Screening grade</b>Decision support for what to test first. Not certified design values.</div>
+          <div class="limit"><b>No polymers</b>Kevlar and UHMWPE are labelled out of scope. Polymer strength comes from fibre processing, not chemistry.</div>
+          <div class="limit"><b>Novel chemistry is harder</b>Error roughly triples for an unseen chemical family. Hence the domain flag on every prediction.</div>
+          <div class="limit"><b>No paying customer yet</b>The technology is further along than the evidence someone will pay. That is the current work.</div>
+          <div class="limit"><b>No cost figure quoted</b>Testing spend varies by material and test suite. Quantifying it for our customers is a question we came here to answer.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="n">08</span>What we need</h2>
+        <div class="ask">
+          <div><b>Test data</b><p>One partner with 20–50 impact tests turns our engine into a model no competitor can replicate.</p></div>
+          <div><b>Introductions</b><p>To engineers who test materials for a living. First question: what does a full evaluation cycle actually cost you?</p></div>
+          <div><b>Compute</b><p>One GPU for structure-aware models. Cloud capacity for simulating chemistries nobody has measured.</p></div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <span>Try it live: <a href="https://alpha-physics-labs.github.io/alpha-dashboard/">alpha-physics-labs.github.io/alpha-dashboard</a></span>
+        <span>github.com/alpha-physics-labs · All predictions are screening grade</span>
+      </div>
+    </div>
+  </body>
+</html>
