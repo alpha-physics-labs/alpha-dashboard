@@ -445,6 +445,13 @@ button {
   font-family: var(--font-sans);
   font-weight: 600;
 }
+.chip--novel {
+  color: var(--good);
+  border-color: transparent;
+  background: var(--good-soft);
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
 
 .predict__error {
   margin-top: 18px;

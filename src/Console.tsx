@@ -10,6 +10,8 @@ import {
 
 const PRESETS = ["WC", "TiB2", "B4C", "SiC", "Al2O3", "Si", "GaAs", "ZrO2"];
 const CLASSICS = "WC TiB2 B4C SiC Al2O3 ZrO2";
+// Solid solutions with no entry in any public database. The point of the product.
+const NOVEL = "B4C SiC Ti0.5Zr0.5B2 Hf0.5Ta0.5C W0.5Ta0.5C";
 
 function parse(input: string): string[] {
   return [...new Set(input.split(/[\s,;]+/).filter(Boolean))].slice(0, 25);
@@ -600,6 +602,16 @@ export default function Console() {
               }}
             >
               Screen the classics
+            </button>
+            <button
+              type="button"
+              className="chip chip--novel"
+              onClick={() => {
+                setInput(NOVEL);
+                run(NOVEL);
+              }}
+            >
+              Screen materials with no data
             </button>
           </div>
 
