@@ -1852,6 +1852,40 @@ button {
   font-size: 11px;
 }
 
+/* panel sizing */
+.sizing {
+  padding: 16px 20px 0;
+}
+.sizing__ctl {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sizing__ctl span {
+  font-size: 14px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.sizing__ctl input[type="range"] {
+  flex: 1;
+  max-width: 320px;
+  accent-color: var(--accent);
+}
+.sizing__ctl b {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  min-width: 60px;
+}
+.sizing__note {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-top: 8px;
+  max-width: 76ch;
+}
+.detail__sec > .sizing + .pgrid {
+  padding: 16px 20px;
+}
+
 /* comparison matrix */
 .matrix {
   width: 100%;

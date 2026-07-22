@@ -304,6 +304,75 @@ type Known = {
 };
 type KnownState = Known | "loading" | "none";
 
+/* ────────────────────────── panel sizing ──────────────────────────
+   Areal density is exact: kg/m² = density (g/cm³) × thickness (mm).
+   No model, no fit — this is the weight budget every protection and
+   lightweighting program is specified against. */
+
+const STEEL_DENSITY = 7.85;
+const PLATE_SIDE_CM = 30;
+
+function PanelSizing({ selected }: { selected: Prediction }) {
+  const [thickness, setThickness] = useState(8);
+  const rho = selected.density_est_gcc;
+  if (rho == null) return null;
+
+  const areal = rho * thickness;
+  const plateMass = areal * (PLATE_SIDE_CM / 100) ** 2;
+  const steelThicknessForSameWeight = areal / STEEL_DENSITY;
+  const vsSteel = ((rho - STEEL_DENSITY) / STEEL_DENSITY) * 100;
+
+  return (
+    <section className="detail__sec">
+      <h3>Panel weight budget</h3>
+      <div className="sizing">
+        <label className="sizing__ctl">
+          <span>Plate thickness</span>
+          <input
+            type="range"
+            min={2}
+            max={30}
+            step={1}
+            value={thickness}
+            onChange={(e) => setThickness(Number(e.target.value))}
+          />
+          <b>{thickness} mm</b>
+        </label>
+        <p className="sizing__note">
+          Areal density is mass per square metre of panel, the number protection and
+          lightweighting specifications are written against. It is exact arithmetic from the
+          estimated density, not a model output.
+        </p>
+      </div>
+      <div className="pgrid">
+        <Cell
+          name="Areal density"
+          value={Number(areal.toFixed(1))}
+          unit="kg/m²"
+          caption={`A ${thickness} mm panel of this material`}
+          tone="accent"
+        />
+        <Cell
+          name={`Mass of a ${PLATE_SIDE_CM}×${PLATE_SIDE_CM} cm plate`}
+          value={Number(plateMass.toFixed(2))}
+          unit="kg"
+          caption="What a person would actually carry"
+        />
+        <Cell
+          name="Steel of the same weight"
+          value={Number(steelThicknessForSameWeight.toFixed(1))}
+          unit="mm"
+          caption={
+            vsSteel < 0
+              ? `This material is ${Math.abs(vsSteel).toFixed(0)}% lighter per unit volume than steel`
+              : `This material is ${vsSteel.toFixed(0)}% heavier per unit volume than steel`
+          }
+        />
+      </div>
+    </section>
+  );
+}
+
 /* ────────────────────────── comparison table ────────────────────────── */
 
 type Col = {
@@ -785,6 +854,8 @@ export default function Console() {
                 <Ashby batch={valid} selected={sel} />
                 <Profile selected={sel} />
               </div>
+
+              <PanelSizing selected={sel} />
 
               <CompareTable batch={valid} selected={sel} onSelect={setSelected} />
 
