@@ -196,6 +196,12 @@
 
       .ask{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:36px}
       .ask--3{grid-template-columns:repeat(3,1fr)}
+      .ask__h{font-size:clamp(30px,4.4vw,52px);max-width:24ch}
+      .ask__sub{margin-top:16px;max-width:64ch}
+      .ask--3{margin-top:26px}
+      .ask--3 > div{padding:18px 20px}
+      .ask--3 b{font-size:22px}
+      .ask--3 p{font-size:14px;margin-top:6px}
       .ask > div{border:1px solid var(--accent);background:var(--accent-soft);
                  border-radius:14px;padding:23px 25px}
       .ask b{display:block;font-family:var(--serif);font-weight:400;font-size:25px}
@@ -406,8 +412,8 @@
     <section class="slide">
       <div class="inner">
         <p class="step r d1">07 &middot; What we need</p>
-        <h2 class="r d2">The engine is built. Now we sharpen it with the right partners.</h2>
-        <p class="sub r d3">We have the technology and the first conversations underway. What accelerates us now is more connections &mdash; teams with real test data to validate the engine and point it at the properties they care about.</p>
+        <h2 class="r d2 ask__h">The engine is built. Now we sharpen it with partners.</h2>
+        <p class="sub r d3 ask__sub">We have the technology and the first conversations underway. What accelerates us is more connections.</p>
         <div class="ask ask--3 r d4">
           <div><b>Test data</b>
             <p>More datasets to validate against &mdash; ballistic and impact results especially,
@@ -419,7 +425,7 @@
             <p>Introductions across the materials and property-testing industries &mdash; the
             teams choosing new materials every day.</p></div>
         </div>
-        <p class="quote r d6">Physics gets us to the cold start. Partner data becomes the moat.</p>
+        <p class="quote r d6" style="font-size:clamp(20px,2.6vw,30px);margin-top:24px;max-width:34ch">Physics gets us to the cold start. Partner data becomes the moat.</p>
       </div>
     </section>
 
