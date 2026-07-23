@@ -11,7 +11,7 @@
       *{margin:0;padding:0;box-sizing:border-box}
       :root{
         --ink:#14161b;--ink2:#4e535d;--ink3:#8b909a;--line:#e5e6ea;--bg:#f6f6f8;
-        --accent:#0a63d8;--accent-soft:#e9f1fd;--good:#1d8a57;--warn:#b25e0b;
+        --accent:#0a63d8;--accent-soft:#e9f1fd;--good:#1d8a57;
         --sans:"Basic",system-ui,sans-serif;
         --serif:"Noto Serif Display",Georgia,serif;
         --mono:"Spline Sans Mono",monospace;
@@ -20,40 +20,51 @@
       html,body{height:100%}
       body{font-family:var(--sans);color:var(--ink);background:var(--bg);overflow:hidden}
 
-      body{perspective:2400px;perspective-origin:50% 45%}
+      /* ── living background: drifting aurora + particle network ── */
+      .aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+      .aurora i{position:absolute;border-radius:50%;filter:blur(90px);display:block}
+      .aurora i:nth-child(1){width:70vmax;height:70vmax;top:-26vmax;right:-18vmax;
+        background:radial-gradient(circle,rgba(10,99,216,.13),transparent 62%);
+        animation:float1 26s ease-in-out infinite alternate}
+      .aurora i:nth-child(2){width:62vmax;height:62vmax;bottom:-24vmax;left:-16vmax;
+        background:radial-gradient(circle,rgba(31,138,109,.11),transparent 62%);
+        animation:float2 32s ease-in-out infinite alternate}
+      .aurora i:nth-child(3){width:50vmax;height:50vmax;top:22%;left:34%;
+        background:radial-gradient(circle,rgba(120,90,220,.07),transparent 64%);
+        animation:float3 38s ease-in-out infinite alternate}
+      @keyframes float1{to{transform:translate(-9vmax,8vmax) scale(1.14)}}
+      @keyframes float2{to{transform:translate(8vmax,-7vmax) scale(1.1)}}
+      @keyframes float3{to{transform:translate(-6vmax,-9vmax) scale(1.18)}}
+
+      #net{position:fixed;inset:0;z-index:1;pointer-events:none;
+           opacity:.5;transition:opacity 1s var(--ease)}
+      body.hero #net{opacity:1}
+
+      /* ── slides: clean horizontal slide ── */
       .slide{position:fixed;inset:0;display:none;padding:clamp(38px,6vw,88px);
-             flex-direction:column;justify-content:center;
-             transform-style:preserve-3d;backface-visibility:hidden;
-             background:var(--bg)}
-      .slide.on{display:flex;z-index:3}
+             flex-direction:column;justify-content:center;z-index:3}
+      .slide.on{display:flex}
       .slide.leaving{display:flex;z-index:2}
-      /* page turn */
-      .slide.on.fwd{animation:pageInF .8s var(--ease) both}
-      .slide.leaving.fwd{animation:pageOutF .8s var(--ease) both}
-      .slide.on.back{animation:pageInB .8s var(--ease) both}
-      .slide.leaving.back{animation:pageOutB .8s var(--ease) both}
-      @keyframes pageInF{from{opacity:0;transform:rotateY(26deg) translateX(8%) scale(.96)}
-                         to{opacity:1;transform:none}}
-      @keyframes pageOutF{from{opacity:1;transform:none}
-                          to{opacity:0;transform:rotateY(-20deg) translateX(-6%) scale(.96)}}
-      @keyframes pageInB{from{opacity:0;transform:rotateY(-26deg) translateX(-8%) scale(.96)}
-                         to{opacity:1;transform:none}}
-      @keyframes pageOutB{from{opacity:1;transform:none}
-                          to{opacity:0;transform:rotateY(20deg) translateX(6%) scale(.96)}}
+      .slide.on.fwd{animation:inFromRight .78s var(--ease) both}
+      .slide.leaving.fwd{animation:outToLeft .78s var(--ease) both}
+      .slide.on.back{animation:inFromLeft .78s var(--ease) both}
+      .slide.leaving.back{animation:outToRight .78s var(--ease) both}
+      @keyframes inFromRight{from{opacity:0;transform:translateX(70px)}to{opacity:1;transform:none}}
+      @keyframes outToLeft{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-52px)}}
+      @keyframes inFromLeft{from{opacity:0;transform:translateX(-70px)}to{opacity:1;transform:none}}
+      @keyframes outToRight{from{opacity:1;transform:none}to{opacity:0;transform:translateX(52px)}}
+
       .inner{max-width:1120px;margin:0 auto;width:100%;position:relative;z-index:2}
 
-      /* staggered entrance — every direct animatable child */
-      .slide.on .r{animation:rise .72s var(--ease) both}
-      /* explicit end states: several elements start at opacity 0 in their base rule,
-         so an open-ended keyframe would animate them from 0 back to 0. */
-      @keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-      .d1{animation-delay:.05s}.d2{animation-delay:.16s}.d3{animation-delay:.28s}
-      .d4{animation-delay:.4s}.d5{animation-delay:.52s}.d6{animation-delay:.64s}
+      .slide.on .r{animation:rise .74s var(--ease) both}
+      @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+      .d1{animation-delay:.12s}.d2{animation-delay:.24s}.d3{animation-delay:.36s}
+      .d4{animation-delay:.48s}.d5{animation-delay:.6s}.d6{animation-delay:.72s}
 
       .step{font-family:var(--mono);font-size:13px;letter-spacing:.14em;
             color:var(--accent);text-transform:uppercase;margin-bottom:20px}
-      h1{font-family:var(--serif);font-weight:400;font-size:clamp(56px,10vw,140px);
-         line-height:.94;letter-spacing:.01em}
+      h1{font-family:var(--serif);font-weight:400;font-size:clamp(64px,12vw,170px);
+         line-height:.9;letter-spacing:.012em}
       h2{font-family:var(--serif);font-weight:400;font-size:clamp(33px,5.2vw,66px);
          line-height:1.06;max-width:19ch}
       .sub{font-size:clamp(16.5px,1.9vw,24px);color:var(--ink2);margin-top:22px;
@@ -62,49 +73,40 @@
       .tiny{font-family:var(--mono);font-size:12.5px;color:var(--ink3);
             margin-top:30px;letter-spacing:.04em;line-height:1.7}
 
-      /* ── hero lattice ── */
-      .lattice{position:fixed;inset:0;z-index:0;pointer-events:none}
-      .lattice circle{fill:#bed1ee;opacity:.85;transform-box:fill-box;transform-origin:center;
-                      animation:drift 14s ease-in-out infinite, breathe 6s ease-in-out infinite}
-      .lattice line{stroke:#dae4f5;stroke-width:1;opacity:.65}
-      .lattice .spark{stroke:var(--accent);stroke-width:1.6;opacity:0;
-                      animation:spark 7s ease-in-out infinite}
-      @keyframes drift{
-        0%,100%{transform:translate(0,0)}
-        33%{transform:translate(7px,-6px)}
-        66%{transform:translate(-5px,5px)}
+      /* ── hero ── */
+      .hero__word span{display:inline-block;opacity:0}
+      .slide.on .hero__word span{animation:letterIn 1.15s var(--ease) both}
+      @keyframes letterIn{
+        0%{opacity:0;transform:translateY(.42em) scale(.92);filter:blur(12px)}
+        60%{filter:blur(0)}
+        100%{opacity:1;transform:none;filter:blur(0)}
       }
-      @keyframes breathe{0%,100%{opacity:.85}50%{opacity:.35}}
-      @keyframes spark{0%,88%,100%{opacity:0}92%{opacity:.75}}
-      /* faint on content slides, full strength on the hero */
-      .slide .lattice{opacity:.4}
-      .slide--hero .lattice{opacity:1}
+      .hero__rule{height:2px;background:linear-gradient(90deg,var(--accent),transparent);
+                  margin-top:26px;max-width:0}
+      .slide.on .hero__rule{animation:ruleGrow 1.4s var(--ease) .7s both}
+      @keyframes ruleGrow{to{max-width:430px}}
 
-      .hero__word{display:block;overflow:hidden}
-      .hero__word span{display:inline-block}
-      .slide.on .hero__word span{animation:letter .9s var(--ease) both}
-
-      @keyframes letter{from{opacity:0;transform:translateY(.5em)}}
-
-      /* live formula → properties */
-      .demo{margin-top:36px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+      .demo{margin-top:34px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
       .demo__in{font-family:var(--mono);font-size:clamp(19px,2.3vw,30px);
                 background:#fff;border:1px solid var(--line);border-radius:11px;
-                padding:12px 20px;box-shadow:0 8px 26px rgba(0,0,0,.06)}
-      .demo__in i{font-style:normal;color:var(--accent);animation:blink 1.1s step-end infinite}
+                padding:12px 20px;box-shadow:0 10px 30px rgba(0,0,0,.07);min-width:190px}
+      .demo__in i{font-style:normal;color:var(--accent);animation:blink 1s step-end infinite}
       @keyframes blink{50%{opacity:0}}
-      .demo__arrow{color:var(--accent);font-size:24px}
+      .demo__arrow{color:var(--accent);font-size:22px;opacity:0}
+      .slide.on .demo__arrow{animation:fade .5s var(--ease) 1.9s both}
+      @keyframes fade{to{opacity:1}}
       .demo__out{display:flex;gap:8px;flex-wrap:wrap}
       .demo__out span{font-family:var(--mono);font-size:14.5px;background:var(--accent-soft);
                       color:var(--accent);border-radius:8px;padding:9px 14px;opacity:0}
-      .slide.on .demo__out span{animation:pop .5s var(--ease) both}
-      @keyframes pop{from{opacity:0;transform:scale(.85) translateY(6px)}to{opacity:1;transform:none}}
+      .slide.on .demo__out span{animation:pop .55s var(--ease) both}
+      @keyframes pop{from{opacity:0;transform:scale(.82) translateY(8px)}to{opacity:1;transform:none}}
 
       /* ── before / after ── */
       .ba{display:grid;grid-template-columns:1fr 62px 1fr;align-items:center;margin-top:42px}
-      .ba__side{padding:24px 28px;border-radius:14px;background:#fff;border:1px solid var(--line)}
+      .ba__side{padding:24px 28px;border-radius:14px;background:rgba(255,255,255,.9);
+                backdrop-filter:blur(6px);border:1px solid var(--line)}
       .ba__side--now{border-color:rgba(10,99,216,.35);
-                     background:linear-gradient(160deg,var(--accent-soft),#fff 62%)}
+                     background:linear-gradient(160deg,var(--accent-soft),rgba(255,255,255,.92) 62%)}
       .ba__tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;
                text-transform:uppercase;color:var(--ink3)}
       .ba__side--now .ba__tag{color:var(--accent)}
@@ -117,34 +119,36 @@
       .slide.on .arrow i{animation:nudge 1.7s ease-in-out infinite}
       @keyframes nudge{50%{transform:rotate(45deg) translate(5px,-5px)}}
 
-      /* ── pipeline ── */
+      /* ── cards ── */
       .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:40px}
-      .pipe > div{background:#fff;border:1px solid var(--line);border-radius:13px;padding:19px 20px}
+      .pipe > div,.who > div,.stats > div{background:rgba(255,255,255,.9);
+        backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:13px}
+      .pipe > div{padding:19px 20px}
       .pipe b{font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.08em}
       .pipe h4{font-size:16.5px;font-weight:600;margin-top:8px}
       .pipe p{font-size:13.5px;color:var(--ink2);margin-top:6px;line-height:1.45}
 
-      /* ── the funnel: 50 candidates → 5 ── */
+      /* ── funnel ── */
       .funnel{margin-top:38px}
       .dots{display:grid;grid-template-columns:repeat(25,1fr);gap:9px;max-width:760px}
       .dots i{aspect-ratio:1;border-radius:50%;background:#d2d5dc;display:block}
-      .slide.on .dots i{animation:dotIn .4s var(--ease) both}
-      .slide.on .dots i.keep{animation:dotIn .4s var(--ease) both,keepOn .7s var(--ease) 1.9s both}
-      .slide.on .dots i.drop{animation:dotIn .4s var(--ease) both,dropOff .7s var(--ease) 1.9s both}
-      @keyframes dotIn{from{opacity:0;transform:scale(0)}}
-      @keyframes keepOn{to{background:var(--accent);transform:scale(1.45)}}
-      @keyframes dropOff{to{background:#e6e8ec;opacity:.35}}
-      .funnel__cap{display:flex;gap:34px;margin-top:26px;flex-wrap:wrap}
+      .slide.on .dots i{animation:dotIn .42s var(--ease) both}
+      .slide.on .dots i.keep{animation:dotIn .42s var(--ease) both,keepOn .8s var(--ease) 2s both}
+      .slide.on .dots i.drop{animation:dotIn .42s var(--ease) both,dropOff .8s var(--ease) 2s both}
+      @keyframes dotIn{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+      @keyframes keepOn{to{background:var(--accent);transform:scale(1.5);
+                           box-shadow:0 0 0 6px rgba(10,99,216,.12)}}
+      @keyframes dropOff{to{background:#e6e8ec;opacity:.3}}
+      .funnel__cap{display:flex;gap:34px;margin-top:28px;flex-wrap:wrap}
       .funnel__cap div{opacity:0}
-      .slide.on .funnel__cap div{animation:rise .6s var(--ease) 2.5s both}
+      .slide.on .funnel__cap div{animation:rise .65s var(--ease) 2.6s both}
       .funnel__cap b{display:block;font-family:var(--serif);font-weight:400;font-size:34px;line-height:1}
       .funnel__cap b.blue{color:var(--accent)}
       .funnel__cap span{display:block;font-size:14px;color:var(--ink2);margin-top:6px}
 
-      /* ── who it helps ── */
+      /* ── who ── */
       .who{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:36px}
-      .who > div{background:#fff;border:1px solid var(--line);border-radius:14px;
-                 padding:22px 22px 19px;transition:transform .3s var(--ease)}
+      .who > div{padding:22px 22px 19px}
       .who h4{font-family:var(--serif);font-weight:400;font-size:21px}
       .who p{font-size:14px;color:var(--ink2);margin-top:7px;line-height:1.45}
       .who em{display:block;font-style:normal;font-family:var(--mono);font-size:11.5px;
@@ -152,7 +156,7 @@
 
       /* ── stats ── */
       .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:40px}
-      .stats > div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:25px 25px 21px}
+      .stats > div{padding:25px 25px 21px}
       .stats b{display:block;font-family:var(--serif);font-weight:400;
                font-size:clamp(36px,4.8vw,56px);line-height:1}
       .stats span{display:block;font-size:14px;color:var(--ink2);margin-top:9px;line-height:1.4}
@@ -161,9 +165,9 @@
 
       /* ── markets ── */
       .mkt{display:flex;flex-wrap:wrap;gap:9px;margin-top:36px}
-      .mkt span{background:#fff;border:1px solid var(--line);border-radius:100px;
+      .mkt span{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:100px;
                 padding:10px 19px;font-size:15.5px;color:var(--ink2);opacity:0}
-      .slide.on .mkt span{animation:pop .5s var(--ease) both}
+      .slide.on .mkt span{animation:pop .55s var(--ease) both}
       .mkt span.first{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 
       .quote{font-family:var(--serif);font-size:clamp(22px,3.1vw,38px);line-height:1.25;
@@ -176,22 +180,22 @@
       .ask p{font-size:15px;color:var(--ink2);margin-top:7px}
 
       /* ── contact ── */
-      .team{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+      .team{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:38px}
       .person{text-align:center}
-      .person figure{width:clamp(110px,13vw,160px);height:clamp(110px,13vw,160px);
+      .person figure{width:clamp(112px,13vw,158px);height:clamp(112px,13vw,158px);
                      margin:0 auto;border-radius:50%;overflow:hidden;background:var(--accent-soft);
                      display:grid;place-items:center;border:3px solid #fff;
-                     box-shadow:0 12px 34px rgba(0,0,0,.10)}
+                     box-shadow:0 14px 38px rgba(0,0,0,.13)}
       .person img{width:100%;height:100%;object-fit:cover;display:block}
       .person figure span{font-family:var(--serif);font-size:38px;color:var(--accent)}
       .person h4{font-family:var(--serif);font-weight:400;font-size:23px;margin-top:16px}
       .person em{display:block;font-style:normal;font-family:var(--mono);font-size:11.5px;
                  letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin-top:5px}
-      .person p{font-size:13.5px;color:var(--ink2);margin-top:9px;line-height:1.6}
+      .person p{font-size:13.5px;margin-top:9px}
       .person a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line)}
       .person a:hover{color:var(--accent)}
       .contact__foot{display:flex;justify-content:center;gap:34px;flex-wrap:wrap;
-                     margin-top:38px;font-family:var(--mono);font-size:13.5px;color:var(--ink3)}
+                     margin-top:36px;font-family:var(--mono);font-size:13.5px;color:var(--ink3)}
       .contact__foot b{color:var(--accent);font-weight:400}
 
       /* nav */
@@ -206,46 +210,46 @@
              font-size:18px;color:var(--ink3);z-index:20}
 
       @media (max-width:900px){
-        .ba,.pipe,.stats,.ask,.who{grid-template-columns:1fr}
+        .ba,.pipe,.stats,.ask,.who,.team{grid-template-columns:1fr}
         .arrow{padding:10px 0}.arrow i{transform:rotate(135deg)}
         .dots{grid-template-columns:repeat(10,1fr)}
       }
+      @media (prefers-reduced-motion:reduce){
+        *{animation-duration:.01ms!important;animation-iteration-count:1!important}
+      }
     </style>
   </head>
-  <body>
+  <body class="hero">
+    <div class="aurora"><i></i><i></i><i></i></div>
+    <canvas id="net"></canvas>
     <div class="brand">ALPHA</div>
 
     <!-- 1 · HERO -->
-    <section class="slide slide--hero on">
-      <svg class="lattice" id="lat" preserveAspectRatio="none"></svg>
+    <section class="slide on">
       <div class="inner">
         <h1 class="hero__word" id="heroWord"></h1>
-        <p class="sub r d3" style="font-size:clamp(18px,2.2vw,28px)">
+        <div class="hero__rule"></div>
+        <p class="sub r d4" style="font-size:clamp(18px,2.2vw,28px)">
           We predict what a material will do <b>before anyone has made it.</b>
         </p>
-        <div class="demo r d4">
-          <span class="demo__in">SiC<i>|</i></span>
-          <span class="demo__arrow">→</span>
+        <div class="demo r d5">
+          <span class="demo__in"><span id="typed"></span><i>|</i></span>
+          <span class="demo__arrow">&rarr;</span>
           <span class="demo__out">
-            <span style="animation-delay:1.15s">stiffness</span>
-            <span style="animation-delay:1.28s">hardness</span>
-            <span style="animation-delay:1.41s">weight</span>
-            <span style="animation-delay:1.54s">brittleness</span>
-            <span style="animation-delay:1.67s">impact physics</span>
+            <span style="animation-delay:2.1s">stiffness</span>
+            <span style="animation-delay:2.24s">hardness</span>
+            <span style="animation-delay:2.38s">weight</span>
+            <span style="animation-delay:2.52s">brittleness</span>
+            <span style="animation-delay:2.66s">impact physics</span>
           </span>
         </div>
-        <p class="tiny r d6">
-          ASMITA POUDEL · SUWAN ARYAL · PORTER DICKENS<br />
-          DIU COMMERCIALIZATION FELLOWSHIP 2026
-        </p>
       </div>
     </section>
 
-    <!-- 2 · WHERE WE STARTED -->
+    <!-- 2 -->
     <section class="slide">
-      <svg class="lattice"></svg>
       <div class="inner">
-        <p class="step r d1">01 · Where we started</p>
+        <p class="step r d1">01 &middot; Where we started</p>
         <h2 class="r d2">We were asked to find a lighter body armour material.</h2>
         <p class="sub r d3">
           Hacking for Defense. A real sponsor, a real problem, a clear ask. So we went looking.
@@ -257,11 +261,10 @@
       </div>
     </section>
 
-    <!-- 3 · THE PIVOT -->
+    <!-- 3 -->
     <section class="slide">
-      <svg class="lattice"></svg>
       <div class="inner">
-        <p class="step r d1">02 · What we learned</p>
+        <p class="step r d1">02 &middot; What we learned</p>
         <h2 class="r d2">We were solving the wrong problem.</h2>
         <p class="sub r d3">
           Nobody is short of candidate materials. An engineer lists forty in an afternoon.
@@ -283,54 +286,37 @@
       </div>
     </section>
 
-    <!-- 4 · THE SOLUTION IN ACTION -->
+    <!-- 4 -->
     <section class="slide">
-      <svg class="lattice"></svg>
       <div class="inner">
-        <p class="step r d1">03 · What it does</p>
+        <p class="step r d1">03 &middot; What it does</p>
         <h2 class="r d2">Fifty candidates. Five worth testing.</h2>
         <div class="funnel">
           <div class="dots" id="dots"></div>
           <div class="funnel__cap">
-            <div>
-              <b>50</b>
-              <span>candidates an engineer can name</span>
-            </div>
-            <div>
-              <b class="blue">5</b>
-              <span>the test budget actually covers</span>
-            </div>
-            <div>
-              <b class="blue">1 sec</b>
-              <span>to know which five</span>
-            </div>
+            <div><b>50</b><span>candidates an engineer can name</span></div>
+            <div><b class="blue">5</b><span>the test budget actually covers</span></div>
+            <div><b class="blue">1 sec</b><span>to know which five</span></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 5 · WHO IT HELPS -->
+    <!-- 5 -->
     <section class="slide">
-      <svg class="lattice"></svg>
       <div class="inner">
-        <p class="step r d1">04 · Who it helps</p>
+        <p class="step r d1">04 &middot; Who it helps</p>
         <h2 class="r d2">Anyone who breaks materials to find out if they work.</h2>
         <div class="who">
-          <div class="r d3">
-            <h4>Protective equipment</h4>
+          <div class="r d3"><h4>Protective equipment</h4>
             <p>Helmet liners, pads, footwear. Choosing what absorbs an impact without the weight.</p>
-            <em>OUR FIRST MARKET</em>
-          </div>
-          <div class="r d4">
-            <h4>Crash &amp; mobility</h4>
+            <em>OUR FIRST MARKET</em></div>
+          <div class="r d4"><h4>Crash &amp; mobility</h4>
             <p>Structures that must be stiff, light, and fail in the right way.</p>
-            <em>SAME PHYSICS</em>
-          </div>
-          <div class="r d5">
-            <h4>Tooling &amp; wear</h4>
+            <em>SAME PHYSICS</em></div>
+          <div class="r d5"><h4>Tooling &amp; wear</h4>
             <p>Inserts and dies chosen on the hardness and toughness frontier.</p>
-            <em>SAME ENGINE</em>
-          </div>
+            <em>SAME ENGINE</em></div>
         </div>
         <p class="sub r d6">
           Each is a property head on one engine. We proved that on build day by training an
@@ -339,11 +325,10 @@
       </div>
     </section>
 
-    <!-- 6 · HOW IT WORKS -->
+    <!-- 6 -->
     <section class="slide">
-      <svg class="lattice"></svg>
       <div class="inner">
-        <p class="step r d1">05 · How it works</p>
+        <p class="step r d1">05 &middot; How it works</p>
         <h2 class="r d2">Physics answers first. The model only corrects it.</h2>
         <div class="pipe">
           <div class="r d3"><b>INPUT</b><h4>A formula</h4>
@@ -356,16 +341,15 @@
             <p>Nine of twelve properties come from classical physics, never guessed.</p></div>
         </div>
         <p class="sub r d6">
-          This is why it works on <b>twenty samples</b> — what a real test campaign produces.
+          This is why it works on <b>twenty samples</b> &mdash; what a real test campaign produces.
         </p>
       </div>
     </section>
 
-    <!-- 7 · WHERE WE ARE -->
+    <!-- 7 -->
     <section class="slide">
-      <svg class="lattice"></svg>
       <div class="inner">
-        <p class="step r d1">06 · Where we are</p>
+        <p class="step r d1">06 &middot; Where we are</p>
         <h2 class="r d2">Live, public, and honest about itself.</h2>
         <div class="stats">
           <div class="hi r d3"><b data-count="-26" data-suffix="%">0</b>
@@ -379,27 +363,21 @@
           Type a material that has never been made and we still answer. Type one we cannot
           judge, and <b>we refuse.</b>
         </p>
-        <p class="tiny r d6">alpha-physics-labs.github.io/alpha-dashboard</p>
       </div>
     </section>
 
-    <!-- 8 · THE ASK -->
+    <!-- 8 -->
     <section class="slide">
-      <svg class="lattice"></svg>
       <div class="inner">
-        <p class="step r d1">07 · What we need</p>
+        <p class="step r d1">07 &middot; What we need</p>
         <h2 class="r d2">The technology is ahead of the proof that anyone will pay.</h2>
         <p class="sub r d3">That is the honest gap, and the one we came here to close.</p>
         <div class="ask r d4">
-          <div>
-            <b>An introduction</b>
+          <div><b>An introduction</b>
             <p>To anyone who tests materials for a living. First question: what does a full
-            evaluation cycle actually cost you?</p>
-          </div>
-          <div>
-            <b>One partner, twenty tests</b>
-            <p>Twenty impact tests turns our engine into a model no competitor can replicate.</p>
-          </div>
+            evaluation cycle actually cost you?</p></div>
+          <div><b>One partner, twenty tests</b>
+            <p>Twenty impact tests turns our engine into a model no competitor can replicate.</p></div>
         </div>
         <p class="quote r d6">Physics gets us to the cold start. Customer data becomes the moat.</p>
       </div>
@@ -407,31 +385,27 @@
 
     <!-- 9 · CONTACT -->
     <section class="slide">
-      <svg class="lattice"></svg>
       <div class="inner">
         <p class="step r d1">Thank you</p>
         <h2 class="r d2" style="max-width:24ch">Let's talk about the materials you're trying to choose.</h2>
         <div class="team">
           <div class="person r d3">
-            <figure><img src="team/asmita.jpg" alt="Asmita Poudel"
+            <figure><img src="team/asmita.png" alt="Asmita Poudel"
               onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'AP'}))" /></figure>
-            <h4>Asmita Poudel</h4>
-            <em>Chief Executive</em>
-            <p><a href="mailto:REPLACE@EMAIL.COM">REPLACE@EMAIL.COM</a></p>
+            <h4>Asmita Poudel</h4><em>Chief Executive</em>
+            <p><a href="mailto:asmita.paudel@usm.edu">asmita.paudel@usm.edu</a></p>
           </div>
           <div class="person r d4">
-            <figure><img src="team/suwan.jpg" alt="Suwan Aryal"
+            <figure><img src="team/suwan.png" alt="Suwan Aryal"
               onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'SA'}))" /></figure>
-            <h4>Suwan Aryal</h4>
-            <em>Chief Technology</em>
-            <p><a href="mailto:aryalsuwan.2003@gmail.com">aryalsuwan.2003@gmail.com</a></p>
+            <h4>Suwan Aryal</h4><em>Chief Technology</em>
+            <p><a href="mailto:suwan.aryal@usm.edu">suwan.aryal@usm.edu</a></p>
           </div>
           <div class="person r d5">
             <figure><img src="team/porter.jpg" alt="Porter Dickens"
               onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'PD'}))" /></figure>
-            <h4>Porter Dickens</h4>
-            <em>Business</em>
-            <p><a href="mailto:REPLACE@EMAIL.COM">REPLACE@EMAIL.COM</a></p>
+            <h4>Porter Dickens</h4><em>Business</em>
+            <p><a href="mailto:aaron.dickens@usm.edu">aaron.dickens@usm.edu</a></p>
           </div>
         </div>
         <div class="contact__foot r d6">
@@ -445,53 +419,90 @@
     <div class="num" id="num"></div>
 
     <script>
-      /* hero title, letter by letter */
-      const word = 'ALPHA';
-      document.getElementById('heroWord').innerHTML = [...word]
-        .map((c, k) => `<span style="animation-delay:${0.12 + k * 0.075}s">${c}</span>`)
-        .join('');
+      /* hero title, letter by letter, resolving out of blur */
+      document.getElementById('heroWord').innerHTML = [...'ALPHA']
+        .map((c, k) => `<span style="animation-delay:${0.15 + k * 0.11}s">${c}</span>`).join('');
 
-      /* hero lattice: atoms on a grid with bonds */
-      (function lattice() {
-        const W = 1600, H = 900, step = 118;
-        const pts = [];
-        for (let y = step / 2; y < H; y += step)
-          for (let x = step / 2; x < W; x += step)
-            pts.push([x + (Math.random() - .5) * 26, y + (Math.random() - .5) * 26]);
-
-        let bonds = '';
-        pts.forEach(([x, y], i) => {
-          pts.slice(i + 1).forEach(([x2, y2]) => {
-            if (Math.hypot(x - x2, y - y2) < step * 1.15)
-              bonds += `<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}"/>`;
-          });
-        });
-        // a scattering of bonds that pulse blue, like energy moving through the lattice
-        let sparks = '';
-        for (let k = 0; k < 14; k++) {
-          const a = pts[Math.floor(Math.random() * pts.length)];
-          const b = pts.reduce((best, p) => {
-            const d = Math.hypot(a[0] - p[0], a[1] - p[1]);
-            return d > 1 && d < step * 1.15 && d < best.d ? { p, d } : best;
-          }, { p: null, d: 1e9 }).p;
-          if (b) sparks += `<line class="spark" x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" style="animation-delay:${(k * 0.62).toFixed(2)}s"/>`;
+      /* the formula types itself, then cycles through real materials */
+      (function typeLoop() {
+        const el = document.getElementById('typed');
+        const words = ['SiC', 'B4C', 'TiB2', 'Ti0.5Zr0.5B2', 'WC'];
+        let w = 0, c = 0, erasing = false;
+        function tick() {
+          const word = words[w];
+          if (!erasing) {
+            el.textContent = word.slice(0, ++c);
+            if (c === word.length) { erasing = true; return setTimeout(tick, 2600); }
+          } else {
+            el.textContent = word.slice(0, --c);
+            if (c === 0) { erasing = false; w = (w + 1) % words.length; }
+          }
+          setTimeout(tick, erasing ? 55 : 130);
         }
-        const atoms = pts.map(([x, y], i) =>
-          `<circle cx="${x}" cy="${y}" r="${3.2 + (i % 3)}" style="animation-delay:${(i % 11) * .9}s,${(i % 7) * .8}s"/>`
-        ).join('');
-
-        document.querySelectorAll('.lattice').forEach((svg) => {
-          svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-          svg.setAttribute('preserveAspectRatio', 'none');
-          svg.innerHTML = bonds + sparks + atoms;
-        });
+        setTimeout(tick, 1400);
       })();
 
-      /* the 50 → 5 funnel */
+      /* living particle network: atoms drifting, bonds forming and breaking */
+      (function network() {
+        const cv = document.getElementById('net');
+        const ctx = cv.getContext('2d');
+        let w, h, pts, dpr;
+
+        function seed() {
+          dpr = Math.min(devicePixelRatio || 1, 2);
+          w = cv.width = innerWidth * dpr;
+          h = cv.height = innerHeight * dpr;
+          cv.style.width = innerWidth + 'px';
+          cv.style.height = innerHeight + 'px';
+          const n = Math.round((innerWidth * innerHeight) / 17000);
+          pts = Array.from({ length: n }, () => ({
+            x: Math.random() * w, y: Math.random() * h,
+            vx: (Math.random() - .5) * .22 * dpr, vy: (Math.random() - .5) * .22 * dpr,
+            r: (1.4 + Math.random() * 2.1) * dpr,
+            ph: Math.random() * Math.PI * 2
+          }));
+        }
+
+        function frame(t) {
+          ctx.clearRect(0, 0, w, h);
+          const link = 150 * dpr;
+          for (const p of pts) {
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0 || p.x > w) p.vx *= -1;
+            if (p.y < 0 || p.y > h) p.vy *= -1;
+          }
+          ctx.lineWidth = 1 * dpr;
+          for (let i = 0; i < pts.length; i++) {
+            for (let j = i + 1; j < pts.length; j++) {
+              const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+              if (d < link) {
+                ctx.strokeStyle = `rgba(120,150,200,${(1 - d / link) * .28})`;
+                ctx.beginPath();
+                ctx.moveTo(pts[i].x, pts[i].y);
+                ctx.lineTo(pts[j].x, pts[j].y);
+                ctx.stroke();
+              }
+            }
+          }
+          for (const p of pts) {
+            const pulse = .55 + .45 * Math.sin(t / 1400 + p.ph);
+            ctx.fillStyle = `rgba(120,155,215,${.22 + pulse * .3})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r * (.85 + pulse * .3), 0, 6.284);
+            ctx.fill();
+          }
+          requestAnimationFrame(frame);
+        }
+        seed();
+        addEventListener('resize', seed);
+        requestAnimationFrame(frame);
+      })();
+
+      /* the 50 to 5 funnel */
       (function funnel() {
         const keep = new Set([7, 14, 23, 31, 42]);
         document.getElementById('dots').innerHTML = Array.from({ length: 50 }, (_, k) =>
-          `<i class="${keep.has(k) ? 'keep' : 'drop'}" style="animation-delay:${k * 0.028}s,1.9s"></i>`
+          `<i class="${keep.has(k) ? 'keep' : 'drop'}" style="animation-delay:${(k * .028).toFixed(3)}s,2s"></i>`
         ).join('');
       })();
 
@@ -499,7 +510,7 @@
       const slides = [...document.querySelectorAll('.slide')];
       const nav = document.getElementById('nav');
       const num = document.getElementById('num');
-      let i = 0;
+      let i = 0, busy = false;
 
       slides.forEach((_, n) => {
         const b = document.createElement('button');
@@ -509,24 +520,23 @@
       });
 
       function countUp(el) {
-        const target = Number(el.dataset.count);
-        const suffix = el.dataset.suffix || '';
-        const dur = 900, t0 = performance.now();
-        const tick = (t) => {
+        const target = Number(el.dataset.count), suffix = el.dataset.suffix || '';
+        const dur = 950, t0 = performance.now();
+        (function tick(t) {
           const p = Math.min(1, (t - t0) / dur);
-          const eased = 1 - Math.pow(1 - p, 3);
-          el.textContent = Math.round(target * eased) + suffix;
+          el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + suffix;
           if (p < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
+        })(t0);
       }
 
       function go(n) {
         const next = Math.max(0, Math.min(slides.length - 1, n));
-        if (next === i && slides[i].classList.contains('on')) return;
+        if (busy || (next === i && slides[i].classList.contains('on'))) return;
+        busy = true;
+        setTimeout(() => (busy = false), 420);
+
         const dir = next > i ? 'fwd' : 'back';
         const outEl = slides[i], inEl = slides[next];
-
         if (outEl !== inEl) {
           outEl.classList.remove('on', 'fwd', 'back');
           outEl.classList.add('leaving', dir);
@@ -534,14 +544,15 @@
         }
         i = next;
         inEl.classList.remove('leaving', 'fwd', 'back');
-        void inEl.offsetWidth;                    // restart the entrance animations
+        void inEl.offsetWidth;
         inEl.classList.add('on', dir);
 
+        document.body.classList.toggle('hero', i === 0);
         [...nav.children].forEach((d, k) => d.classList.toggle('on', k === i));
         num.textContent = (i + 1) + ' / ' + slides.length;
         inEl.querySelectorAll('[data-count]').forEach((el) => {
           el.textContent = '0';
-          setTimeout(() => countUp(el), 460);
+          setTimeout(() => countUp(el), 500);
         });
       }
 
@@ -552,7 +563,7 @@
         if (e.key === 'End') go(slides.length - 1);
       });
       addEventListener('click', (e) => { if (!e.target.closest('.dot')) go(i + 1); });
-      go(0);
+      num.textContent = '1 / ' + slides.length;
     </script>
   </body>
 </html>
