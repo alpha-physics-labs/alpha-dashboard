@@ -20,16 +20,33 @@
       html,body{height:100%}
       body{font-family:var(--sans);color:var(--ink);background:var(--bg);overflow:hidden}
 
-      /* ── background: fine engineering grid under a soft, slow colour field ── */
+      /* ── background: real crystal structures, drawn precisely and drifting slowly ── */
       .grid{position:fixed;inset:0;z-index:0;pointer-events:none;
         background-image:
-          linear-gradient(rgba(20,40,80,.045) 1px,transparent 1px),
-          linear-gradient(90deg,rgba(20,40,80,.045) 1px,transparent 1px),
-          linear-gradient(rgba(20,40,80,.028) 1px,transparent 1px),
-          linear-gradient(90deg,rgba(20,40,80,.028) 1px,transparent 1px);
-        background-size:132px 132px,132px 132px,26.4px 26.4px,26.4px 26.4px;
-        mask-image:radial-gradient(ellipse 120% 90% at 50% 45%,#000 40%,transparent 100%);
-        -webkit-mask-image:radial-gradient(ellipse 120% 90% at 50% 45%,#000 40%,transparent 100%)}
+          linear-gradient(rgba(20,40,80,.030) 1px,transparent 1px),
+          linear-gradient(90deg,rgba(20,40,80,.030) 1px,transparent 1px);
+        background-size:120px 120px,120px 120px;
+        mask-image:radial-gradient(ellipse 110% 85% at 50% 45%,#000 30%,transparent 100%);
+        -webkit-mask-image:radial-gradient(ellipse 110% 85% at 50% 45%,#000 30%,transparent 100%)}
+
+      .crystals{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+      .crystals svg{position:absolute;overflow:visible}
+      .crystals .bond{fill:none;stroke:#8fa8cc;stroke-width:1.1;opacity:.30}
+      .crystals .atom{fill:#7f9cc6;opacity:.42}
+      .crystals .atom--big{fill:#5f86bd;opacity:.5}
+
+      /* hexagonal sheet, upper right */
+      #cHex{top:-16vh;right:-14vw;width:74vw;height:112vh;
+            transform-origin:60% 40%;animation:spinA 190s linear infinite}
+      /* cubic cell in isometric, lower left */
+      #cCube{bottom:-14vh;left:-8vw;width:46vw;height:82vh;
+             transform-origin:40% 60%;animation:spinB 240s linear infinite reverse}
+
+      @keyframes spinA{to{transform:rotate(360deg)}}
+      @keyframes spinB{to{transform:rotate(360deg)}}
+
+      .crystals{opacity:.5;transition:opacity 1.1s var(--ease)}
+      body.hero .crystals{opacity:1}
 
       .aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
       .aurora i{position:absolute;border-radius:50%;filter:blur(120px);display:block}
@@ -243,6 +260,10 @@
   <body class="hero">
     <div class="grid"></div>
     <div class="aurora"><i></i><i></i></div>
+    <div class="crystals">
+      <svg id="cHex" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice"></svg>
+      <svg id="cCube" viewBox="0 0 700 700" preserveAspectRatio="xMidYMid slice"></svg>
+    </div>
     <div class="brand">ALPHA</div>
 
     <!-- 1 · HERO -->
@@ -391,8 +412,8 @@
     <section class="slide">
       <div class="inner">
         <p class="step r d1">07 &middot; What we need</p>
-        <h2 class="r d2">The technology is ahead of the proof that anyone will pay.</h2>
-        <p class="sub r d3">That is the honest gap, and the one we came here to close.</p>
+        <h2 class="r d2">We have the engine. We need the first customer.</h2>
+        <p class="sub r d3">We built the technology before we proved anyone will buy it. That is the gap, and it is the one we came here to close.</p>
         <div class="ask r d4">
           <div><b>An introduction</b>
             <p>To anyone who tests materials for a living. First question: what does a full
@@ -443,6 +464,74 @@
       /* hero title, letter by letter, resolving out of blur */
       document.getElementById('heroWord').innerHTML = [...'ALPHA']
         .map((c, k) => `<span style="animation-delay:${0.15 + k * 0.11}s">${c}</span>`).join('');
+
+      /* ── draw two real crystal structures ──
+         A hexagonal close-packed sheet (the TiB2 / graphene motif) and a
+         face-centred cubic cell in isometric projection. Precise geometry,
+         not a particle field. */
+      (function crystals() {
+        // hexagonal sheet: honeycomb of shared edges, atoms on every vertex
+        const hex = document.getElementById('cHex');
+        const R = 62, W = 1000, H = 1000;
+        const dx = R * 1.5, dy = R * Math.sqrt(3);
+        let edges = '', seen = new Set(), atoms = new Set();
+        for (let col = -1; col * dx < W + R; col++) {
+          for (let row = -1; row * dy < H + R; row++) {
+            const cx = col * dx;
+            const cy = row * dy + (col % 2 ? dy / 2 : 0);
+            const v = [];
+            for (let k = 0; k < 6; k++) {
+              const ang = Math.PI / 180 * (60 * k);
+              v.push([+(cx + R * Math.cos(ang)).toFixed(1), +(cy + R * Math.sin(ang)).toFixed(1)]);
+            }
+            for (let k = 0; k < 6; k++) {
+              const p = v[k], q = v[(k + 1) % 6];
+              const key = [p, q].map(String).sort().join('|');
+              if (seen.has(key)) continue;
+              seen.add(key);
+              edges += `<line class="bond" x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}"/>`;
+              atoms.add(p.join(',')); atoms.add(q.join(','));
+            }
+          }
+        }
+        let dots = '';
+        atoms.forEach(a => {
+          const [x, y] = a.split(',');
+          dots += `<circle class="atom" cx="${x}" cy="${y}" r="3.4"/>`;
+        });
+        hex.innerHTML = edges + dots;
+
+        // face-centred cubic cell, isometric: corners, face centres, cell edges
+        const cube = document.getElementById('cCube');
+        const S = 210, O = [250, 300];
+        const iso = (x, y, z) => [
+          O[0] + (x - z) * S * 0.866,
+          O[1] + (x + z) * S * 0.5 - y * S
+        ];
+        const corners = [];
+        for (const x of [0, 1]) for (const y of [0, 1]) for (const z of [0, 1]) corners.push([x, y, z]);
+        let cEdges = '';
+        for (let i = 0; i < corners.length; i++)
+          for (let j = i + 1; j < corners.length; j++) {
+            const d = corners[i].reduce((t, v, k) => t + Math.abs(v - corners[j][k]), 0);
+            if (d === 1) {
+              const p = iso(...corners[i]), q = iso(...corners[j]);
+              cEdges += `<line class="bond" x1="${p[0].toFixed(1)}" y1="${p[1].toFixed(1)}" x2="${q[0].toFixed(1)}" y2="${q[1].toFixed(1)}"/>`;
+            }
+          }
+        let cAtoms = '';
+        corners.forEach(c => {
+          const p = iso(...c);
+          cAtoms += `<circle class="atom--big" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="9"/>`;
+        });
+        // face centres — what makes it face-centred cubic
+        const faces = [[.5,.5,0],[.5,.5,1],[.5,0,.5],[.5,1,.5],[0,.5,.5],[1,.5,.5]];
+        faces.forEach(c => {
+          const p = iso(...c);
+          cAtoms += `<circle class="atom" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="7"/>`;
+        });
+        cube.innerHTML = cEdges + cAtoms;
+      })();
 
       /* the hero cycles through real materials and their real predicted values */
       const MATERIALS = [
