@@ -20,25 +20,27 @@
       html,body{height:100%}
       body{font-family:var(--sans);color:var(--ink);background:var(--bg);overflow:hidden}
 
-      /* ── living background: drifting aurora + particle network ── */
-      .aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-      .aurora i{position:absolute;border-radius:50%;filter:blur(90px);display:block}
-      .aurora i:nth-child(1){width:70vmax;height:70vmax;top:-26vmax;right:-18vmax;
-        background:radial-gradient(circle,rgba(10,99,216,.13),transparent 62%);
-        animation:float1 26s ease-in-out infinite alternate}
-      .aurora i:nth-child(2){width:62vmax;height:62vmax;bottom:-24vmax;left:-16vmax;
-        background:radial-gradient(circle,rgba(31,138,109,.11),transparent 62%);
-        animation:float2 32s ease-in-out infinite alternate}
-      .aurora i:nth-child(3){width:50vmax;height:50vmax;top:22%;left:34%;
-        background:radial-gradient(circle,rgba(120,90,220,.07),transparent 64%);
-        animation:float3 38s ease-in-out infinite alternate}
-      @keyframes float1{to{transform:translate(-9vmax,8vmax) scale(1.14)}}
-      @keyframes float2{to{transform:translate(8vmax,-7vmax) scale(1.1)}}
-      @keyframes float3{to{transform:translate(-6vmax,-9vmax) scale(1.18)}}
+      /* ── background: fine engineering grid under a soft, slow colour field ── */
+      .grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+        background-image:
+          linear-gradient(rgba(20,40,80,.045) 1px,transparent 1px),
+          linear-gradient(90deg,rgba(20,40,80,.045) 1px,transparent 1px),
+          linear-gradient(rgba(20,40,80,.028) 1px,transparent 1px),
+          linear-gradient(90deg,rgba(20,40,80,.028) 1px,transparent 1px);
+        background-size:132px 132px,132px 132px,26.4px 26.4px,26.4px 26.4px;
+        mask-image:radial-gradient(ellipse 120% 90% at 50% 45%,#000 40%,transparent 100%);
+        -webkit-mask-image:radial-gradient(ellipse 120% 90% at 50% 45%,#000 40%,transparent 100%)}
 
-      #net{position:fixed;inset:0;z-index:1;pointer-events:none;
-           opacity:.5;transition:opacity 1s var(--ease)}
-      body.hero #net{opacity:1}
+      .aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+      .aurora i{position:absolute;border-radius:50%;filter:blur(120px);display:block}
+      .aurora i:nth-child(1){width:66vmax;height:66vmax;top:-24vmax;right:-16vmax;
+        background:radial-gradient(circle,rgba(10,99,216,.10),transparent 62%);
+        animation:float1 34s ease-in-out infinite alternate}
+      .aurora i:nth-child(2){width:58vmax;height:58vmax;bottom:-22vmax;left:-14vmax;
+        background:radial-gradient(circle,rgba(31,138,109,.07),transparent 62%);
+        animation:float2 44s ease-in-out infinite alternate}
+      @keyframes float1{to{transform:translate(-6vmax,5vmax) scale(1.1)}}
+      @keyframes float2{to{transform:translate(5vmax,-4vmax) scale(1.08)}}
 
       /* ── slides: clean horizontal slide ── */
       .slide{position:fixed;inset:0;display:none;padding:clamp(38px,6vw,88px);
@@ -95,10 +97,18 @@
       .demo__arrow{color:var(--accent);font-size:22px;opacity:0}
       .slide.on .demo__arrow{animation:fade .5s var(--ease) 1.9s both}
       @keyframes fade{to{opacity:1}}
-      .demo__out{display:flex;gap:8px;flex-wrap:wrap}
-      .demo__out span{font-family:var(--mono);font-size:14.5px;background:var(--accent-soft);
-                      color:var(--accent);border-radius:8px;padding:9px 14px;opacity:0}
-      .slide.on .demo__out span{animation:pop .55s var(--ease) both}
+      .demo__out{display:flex;gap:9px;flex-wrap:wrap}
+      .demo__out > span{display:flex;flex-direction:column;align-items:flex-start;gap:1px;
+                        background:rgba(255,255,255,.93);border:1px solid var(--line);
+                        border-radius:10px;padding:9px 15px 8px;min-width:98px;opacity:0;
+                        box-shadow:0 6px 20px rgba(0,0,0,.05)}
+      .slide.on .demo__out > span{animation:pop .55s var(--ease) both}
+      .demo__out em{font-style:normal;font-size:11px;color:var(--ink3);letter-spacing:.03em}
+      .demo__out b{font-family:var(--mono);font-weight:500;font-size:19px;color:var(--accent);
+                   line-height:1.15;transition:opacity .16s,transform .16s}
+      .demo__out b.flip{opacity:0;transform:translateY(-5px)}
+      .demo__out i{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--ink3)}
+      .demo__out .struct b{font-family:var(--sans);font-size:15px;color:var(--ink)}
       @keyframes pop{from{opacity:0;transform:scale(.82) translateY(8px)}to{opacity:1;transform:none}}
 
       /* ── before / after ── */
@@ -199,11 +209,22 @@
       .contact__foot b{color:var(--accent);font-weight:400}
 
       /* nav */
-      .nav{position:fixed;bottom:20px;left:0;right:0;display:flex;justify-content:center;
-           gap:7px;z-index:20}
-      .dot{width:28px;height:4px;border-radius:2px;background:#d6d8de;border:none;
-           cursor:pointer;transition:background .25s}
-      .dot.on{background:var(--accent)}
+      .nav{position:fixed;bottom:22px;left:0;right:0;display:flex;justify-content:center;
+           align-items:center;gap:8px;z-index:20}
+      .dot{position:relative;width:10px;height:5px;border-radius:3px;background:#d3d6dd;
+           border:none;cursor:pointer;overflow:hidden;
+           transition:width .5s var(--ease),background .35s var(--ease)}
+      .dot:hover{background:#b6bcc7}
+      .dot.on{width:52px;background:#cfdcf1}
+      /* the active bar fills, then a light sweeps across it */
+      .dot.on::after{content:'';position:absolute;inset:0;border-radius:3px;
+                     background:var(--accent);transform-origin:left;
+                     animation:fill .55s var(--ease) both}
+      .dot.on::before{content:'';position:absolute;top:0;bottom:0;width:40%;z-index:2;
+                      background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);
+                      animation:sweep 2.6s ease-in-out .7s infinite}
+      @keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+      @keyframes sweep{0%{left:-45%}55%,100%{left:105%}}
       .num{position:fixed;bottom:18px;right:24px;font-family:var(--mono);
            font-size:12px;color:var(--ink3);z-index:20}
       .brand{position:fixed;top:24px;left:28px;font-family:var(--serif);
@@ -220,8 +241,8 @@
     </style>
   </head>
   <body class="hero">
-    <div class="aurora"><i></i><i></i><i></i></div>
-    <canvas id="net"></canvas>
+    <div class="grid"></div>
+    <div class="aurora"><i></i><i></i></div>
     <div class="brand">ALPHA</div>
 
     <!-- 1 · HERO -->
@@ -235,12 +256,12 @@
         <div class="demo r d5">
           <span class="demo__in"><span id="typed"></span><i>|</i></span>
           <span class="demo__arrow">&rarr;</span>
-          <span class="demo__out">
-            <span style="animation-delay:2.1s">stiffness</span>
-            <span style="animation-delay:2.24s">hardness</span>
-            <span style="animation-delay:2.38s">weight</span>
-            <span style="animation-delay:2.52s">brittleness</span>
-            <span style="animation-delay:2.66s">impact physics</span>
+          <span class="demo__out" id="props">
+            <span><em>shear</em><b data-k="G">&mdash;</b><i>GPa</i></span>
+            <span><em>hardness</em><b data-k="Hv">&mdash;</b><i>GPa</i></span>
+            <span><em>Young&rsquo;s E</em><b data-k="E">&mdash;</b><i>GPa</i></span>
+            <span><em>density</em><b data-k="rho">&mdash;</b><i>g/cm&sup3;</i></span>
+            <span class="struct"><em>structure</em><b data-k="sys">&mdash;</b></span>
           </span>
         </div>
       </div>
@@ -393,7 +414,7 @@
             <figure><img src="team/asmita.png" alt="Asmita Poudel"
               onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'AP'}))" /></figure>
             <h4>Asmita Poudel</h4><em>Chief Executive</em>
-            <p><a href="mailto:asmita.paudel@usm.edu">asmita.paudel@usm.edu</a></p>
+            <p><a href="mailto:a.paudel@usm.edu">a.paudel@usm.edu</a></p>
           </div>
           <div class="person r d4">
             <figure><img src="team/suwan.png" alt="Suwan Aryal"
@@ -423,79 +444,55 @@
       document.getElementById('heroWord').innerHTML = [...'ALPHA']
         .map((c, k) => `<span style="animation-delay:${0.15 + k * 0.11}s">${c}</span>`).join('');
 
-      /* the formula types itself, then cycles through real materials */
-      (function typeLoop() {
-        const el = document.getElementById('typed');
-        const words = ['SiC', 'B4C', 'TiB2', 'Ti0.5Zr0.5B2', 'WC'];
-        let w = 0, c = 0, erasing = false;
+      /* the hero cycles through real materials and their real predicted values */
+      const MATERIALS = [
+        { f:'SiC',           G:165.3, Hv:28.2, E:389.9, rho:2.55,  sys:'cubic' },
+        { f:'B4C',           G:142.9, Hv:17.8, E:355.3, rho:2.67,  sys:'rhombohedral' },
+        { f:'TiB2',          G:193.5, Hv:31.8, E:455.3, rho:3.72,  sys:'hexagonal' },
+        { f:'Ti0.5Zr0.5B2',  G:186.8, Hv:36.0, E:428.2, rho:4.42,  sys:'solid solution' },
+        { f:'WC',            G:259.3, Hv:30.5, E:632.5, rho:14.99, sys:'hexagonal' }
+      ];
+      let matIdx = 0;
+
+      /* type the formula, flip in its real predicted values, restructure the lattice */
+      (function materialCycle() {
+        const typed = document.getElementById('typed');
+        const cells = [].slice.call(document.querySelectorAll('#props b'));
+        const fmt = {
+          G: function (v) { return v.toFixed(1); },
+          Hv: function (v) { return v.toFixed(1); },
+          E: function (v) { return v.toFixed(0); },
+          rho: function (v) { return v.toFixed(2); },
+          sys: function (v) { return v; }
+        };
+
+        function show(m) {
+          cells.forEach(function (b, k) {
+            b.classList.add('flip');
+            setTimeout(function () {
+              b.textContent = fmt[b.dataset.k](m[b.dataset.k]);
+              b.classList.remove('flip');
+            }, 140 + k * 60);
+          });
+        }
+
+        let c = 0, erasing = false;
         function tick() {
-          const word = words[w];
+          const m = MATERIALS[matIdx], word = m.f;
           if (!erasing) {
-            el.textContent = word.slice(0, ++c);
-            if (c === word.length) { erasing = true; return setTimeout(tick, 2600); }
-          } else {
-            el.textContent = word.slice(0, --c);
-            if (c === 0) { erasing = false; w = (w + 1) % words.length; }
-          }
-          setTimeout(tick, erasing ? 55 : 130);
-        }
-        setTimeout(tick, 1400);
-      })();
-
-      /* living particle network: atoms drifting, bonds forming and breaking */
-      (function network() {
-        const cv = document.getElementById('net');
-        const ctx = cv.getContext('2d');
-        let w, h, pts, dpr;
-
-        function seed() {
-          dpr = Math.min(devicePixelRatio || 1, 2);
-          w = cv.width = innerWidth * dpr;
-          h = cv.height = innerHeight * dpr;
-          cv.style.width = innerWidth + 'px';
-          cv.style.height = innerHeight + 'px';
-          const n = Math.round((innerWidth * innerHeight) / 17000);
-          pts = Array.from({ length: n }, () => ({
-            x: Math.random() * w, y: Math.random() * h,
-            vx: (Math.random() - .5) * .22 * dpr, vy: (Math.random() - .5) * .22 * dpr,
-            r: (1.4 + Math.random() * 2.1) * dpr,
-            ph: Math.random() * Math.PI * 2
-          }));
-        }
-
-        function frame(t) {
-          ctx.clearRect(0, 0, w, h);
-          const link = 150 * dpr;
-          for (const p of pts) {
-            p.x += p.vx; p.y += p.vy;
-            if (p.x < 0 || p.x > w) p.vx *= -1;
-            if (p.y < 0 || p.y > h) p.vy *= -1;
-          }
-          ctx.lineWidth = 1 * dpr;
-          for (let i = 0; i < pts.length; i++) {
-            for (let j = i + 1; j < pts.length; j++) {
-              const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
-              if (d < link) {
-                ctx.strokeStyle = `rgba(120,150,200,${(1 - d / link) * .28})`;
-                ctx.beginPath();
-                ctx.moveTo(pts[i].x, pts[i].y);
-                ctx.lineTo(pts[j].x, pts[j].y);
-                ctx.stroke();
-              }
+            typed.textContent = word.slice(0, ++c);
+            if (c === word.length) {
+              show(m);
+              erasing = true;
+              return setTimeout(tick, 3200);
             }
+          } else {
+            typed.textContent = word.slice(0, --c);
+            if (c === 0) { erasing = false; matIdx = (matIdx + 1) % MATERIALS.length; }
           }
-          for (const p of pts) {
-            const pulse = .55 + .45 * Math.sin(t / 1400 + p.ph);
-            ctx.fillStyle = `rgba(120,155,215,${.22 + pulse * .3})`;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r * (.85 + pulse * .3), 0, 6.284);
-            ctx.fill();
-          }
-          requestAnimationFrame(frame);
+          setTimeout(tick, erasing ? 45 : 105);
         }
-        seed();
-        addEventListener('resize', seed);
-        requestAnimationFrame(frame);
+        setTimeout(tick, 1300);
       })();
 
       /* the 50 to 5 funnel */
