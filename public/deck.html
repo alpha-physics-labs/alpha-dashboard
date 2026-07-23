@@ -15,136 +15,214 @@
         --sans:"Basic",system-ui,sans-serif;
         --serif:"Noto Serif Display",Georgia,serif;
         --mono:"Spline Sans Mono",monospace;
+        --ease:cubic-bezier(.22,1,.36,1);
       }
       html,body{height:100%}
       body{font-family:var(--sans);color:var(--ink);background:var(--bg);overflow:hidden}
 
-      .slide{
-        position:fixed;inset:0;display:none;
-        padding:clamp(40px,6vw,90px);
-        flex-direction:column;justify-content:center;
-      }
-      .slide.on{display:flex;animation:in .5s cubic-bezier(.22,1,.36,1) both}
-      @keyframes in{from{opacity:0;transform:translateY(14px)}}
-      .inner{max-width:1100px;margin:0 auto;width:100%}
+      .slide{position:fixed;inset:0;display:none;padding:clamp(38px,6vw,88px);
+             flex-direction:column;justify-content:center}
+      .slide.on{display:flex}
+      .inner{max-width:1120px;margin:0 auto;width:100%;position:relative;z-index:2}
+
+      /* staggered entrance — every direct animatable child */
+      .slide.on .r{animation:rise .72s var(--ease) both}
+      /* explicit end states: several elements start at opacity 0 in their base rule,
+         so an open-ended keyframe would animate them from 0 back to 0. */
+      @keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+      .d1{animation-delay:.05s}.d2{animation-delay:.16s}.d3{animation-delay:.28s}
+      .d4{animation-delay:.4s}.d5{animation-delay:.52s}.d6{animation-delay:.64s}
 
       .step{font-family:var(--mono);font-size:13px;letter-spacing:.14em;
-            color:var(--accent);text-transform:uppercase;margin-bottom:22px}
-      h1{font-family:var(--serif);font-weight:400;font-size:clamp(52px,9vw,120px);
-         line-height:.98;letter-spacing:.005em}
-      h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5.4vw,68px);
-         line-height:1.06;letter-spacing:.005em;max-width:19ch}
-      .sub{font-size:clamp(17px,2vw,25px);color:var(--ink2);margin-top:24px;max-width:52ch;line-height:1.45}
+            color:var(--accent);text-transform:uppercase;margin-bottom:20px}
+      h1{font-family:var(--serif);font-weight:400;font-size:clamp(56px,10vw,140px);
+         line-height:.94;letter-spacing:.01em}
+      h2{font-family:var(--serif);font-weight:400;font-size:clamp(33px,5.2vw,66px);
+         line-height:1.06;max-width:19ch}
+      .sub{font-size:clamp(16.5px,1.9vw,24px);color:var(--ink2);margin-top:22px;
+           max-width:54ch;line-height:1.45}
       .sub b{color:var(--ink);font-weight:400}
-      .tiny{font-family:var(--mono);font-size:13px;color:var(--ink3);margin-top:34px;letter-spacing:.03em}
+      .tiny{font-family:var(--mono);font-size:12.5px;color:var(--ink3);
+            margin-top:30px;letter-spacing:.04em;line-height:1.7}
 
-      /* before / after */
-      .ba{display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;margin-top:46px;gap:0}
-      .ba__side{padding:26px 30px;border-radius:14px;background:#fff;border:1px solid var(--line)}
+      /* ── hero lattice ── */
+      .lattice{position:fixed;inset:0;z-index:1;pointer-events:none}
+      .lattice circle{fill:#c3d4ee;opacity:0}
+      .slide.on .lattice circle{animation:atomIn .9s var(--ease) both,
+                                          breathe 5s ease-in-out infinite}
+      .lattice line{stroke:#d7e2f4;stroke-width:1;opacity:0}
+      .slide.on .lattice line{animation:bondIn 1.1s var(--ease) both}
+      @keyframes atomIn{from{opacity:0;transform:scale(0)}to{opacity:.85;transform:scale(1)}}
+      @keyframes bondIn{to{opacity:.7}}
+      @keyframes breathe{50%{opacity:.4}}
+
+      .hero__word{display:block;overflow:hidden}
+      .hero__word span{display:inline-block}
+      .slide.on .hero__word span{animation:letter .9s var(--ease) both}
+
+      @keyframes letter{from{opacity:0;transform:translateY(.5em)}}
+
+      /* live formula → properties */
+      .demo{margin-top:36px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+      .demo__in{font-family:var(--mono);font-size:clamp(19px,2.3vw,30px);
+                background:#fff;border:1px solid var(--line);border-radius:11px;
+                padding:12px 20px;box-shadow:0 8px 26px rgba(0,0,0,.06)}
+      .demo__in i{font-style:normal;color:var(--accent);animation:blink 1.1s step-end infinite}
+      @keyframes blink{50%{opacity:0}}
+      .demo__arrow{color:var(--accent);font-size:24px}
+      .demo__out{display:flex;gap:8px;flex-wrap:wrap}
+      .demo__out span{font-family:var(--mono);font-size:14.5px;background:var(--accent-soft);
+                      color:var(--accent);border-radius:8px;padding:9px 14px;opacity:0}
+      .slide.on .demo__out span{animation:pop .5s var(--ease) both}
+      @keyframes pop{from{opacity:0;transform:scale(.85) translateY(6px)}to{opacity:1;transform:none}}
+
+      /* ── before / after ── */
+      .ba{display:grid;grid-template-columns:1fr 62px 1fr;align-items:center;margin-top:42px}
+      .ba__side{padding:24px 28px;border-radius:14px;background:#fff;border:1px solid var(--line)}
       .ba__side--now{border-color:rgba(10,99,216,.35);
-                     background:linear-gradient(160deg,var(--accent-soft),#fff 60%)}
-      .ba__tag{font-family:var(--mono);font-size:12px;letter-spacing:.1em;
+                     background:linear-gradient(160deg,var(--accent-soft),#fff 62%)}
+      .ba__tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;
                text-transform:uppercase;color:var(--ink3)}
       .ba__side--now .ba__tag{color:var(--accent)}
-      .ba__side h3{font-family:var(--serif);font-weight:400;font-size:clamp(21px,2.5vw,30px);
-                   margin-top:10px;line-height:1.2}
-      .ba__side p{font-size:15.5px;color:var(--ink2);margin-top:10px}
+      .ba__side h3{font-family:var(--serif);font-weight:400;
+                   font-size:clamp(20px,2.4vw,29px);margin-top:9px;line-height:1.2}
+      .ba__side p{font-size:15px;color:var(--ink2);margin-top:9px}
       .arrow{display:grid;place-items:center}
-      .arrow i{width:22px;height:22px;border-top:2px solid var(--accent);
+      .arrow i{width:20px;height:20px;border-top:2px solid var(--accent);
                border-right:2px solid var(--accent);transform:rotate(45deg)}
+      .slide.on .arrow i{animation:nudge 1.7s ease-in-out infinite}
+      @keyframes nudge{50%{transform:rotate(45deg) translate(5px,-5px)}}
 
-      /* pipeline */
-      .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:44px}
-      .pipe div{background:#fff;border:1px solid var(--line);border-radius:13px;padding:20px 22px}
-      .pipe b{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.08em}
-      .pipe h4{font-size:17px;font-weight:600;margin-top:9px}
-      .pipe p{font-size:14px;color:var(--ink2);margin-top:6px;line-height:1.45}
+      /* ── pipeline ── */
+      .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:40px}
+      .pipe > div{background:#fff;border:1px solid var(--line);border-radius:13px;padding:19px 20px}
+      .pipe b{font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.08em}
+      .pipe h4{font-size:16.5px;font-weight:600;margin-top:8px}
+      .pipe p{font-size:13.5px;color:var(--ink2);margin-top:6px;line-height:1.45}
 
-      /* stats */
-      .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:44px}
-      .stats div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px 26px 22px}
+      /* ── the funnel: 50 candidates → 5 ── */
+      .funnel{margin-top:38px}
+      .dots{display:grid;grid-template-columns:repeat(25,1fr);gap:9px;max-width:760px}
+      .dots i{aspect-ratio:1;border-radius:50%;background:#d2d5dc;display:block}
+      .slide.on .dots i{animation:dotIn .4s var(--ease) both}
+      .slide.on .dots i.keep{animation:dotIn .4s var(--ease) both,keepOn .7s var(--ease) 1.9s both}
+      .slide.on .dots i.drop{animation:dotIn .4s var(--ease) both,dropOff .7s var(--ease) 1.9s both}
+      @keyframes dotIn{from{opacity:0;transform:scale(0)}}
+      @keyframes keepOn{to{background:var(--accent);transform:scale(1.45)}}
+      @keyframes dropOff{to{background:#e6e8ec;opacity:.35}}
+      .funnel__cap{display:flex;gap:34px;margin-top:26px;flex-wrap:wrap}
+      .funnel__cap div{opacity:0}
+      .slide.on .funnel__cap div{animation:rise .6s var(--ease) 2.5s both}
+      .funnel__cap b{display:block;font-family:var(--serif);font-weight:400;font-size:34px;line-height:1}
+      .funnel__cap b.blue{color:var(--accent)}
+      .funnel__cap span{display:block;font-size:14px;color:var(--ink2);margin-top:6px}
+
+      /* ── who it helps ── */
+      .who{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:36px}
+      .who > div{background:#fff;border:1px solid var(--line);border-radius:14px;
+                 padding:22px 22px 19px;transition:transform .3s var(--ease)}
+      .who h4{font-family:var(--serif);font-weight:400;font-size:21px}
+      .who p{font-size:14px;color:var(--ink2);margin-top:7px;line-height:1.45}
+      .who em{display:block;font-style:normal;font-family:var(--mono);font-size:11.5px;
+              color:var(--accent);margin-top:11px;letter-spacing:.04em}
+
+      /* ── stats ── */
+      .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:40px}
+      .stats > div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:25px 25px 21px}
       .stats b{display:block;font-family:var(--serif);font-weight:400;
-               font-size:clamp(38px,5vw,58px);line-height:1}
-      .stats span{display:block;font-size:14.5px;color:var(--ink2);margin-top:10px;line-height:1.4}
+               font-size:clamp(36px,4.8vw,56px);line-height:1}
+      .stats span{display:block;font-size:14px;color:var(--ink2);margin-top:9px;line-height:1.4}
       .stats .hi{background:var(--accent);border-color:var(--accent)}
-      .stats .hi b{color:#fff}
-      .stats .hi span{color:#fff;opacity:.92}
+      .stats .hi b{color:#fff}.stats .hi span{color:#fff;opacity:.92}
 
-      /* market row */
-      .mkt{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px}
+      /* ── markets ── */
+      .mkt{display:flex;flex-wrap:wrap;gap:9px;margin-top:36px}
       .mkt span{background:#fff;border:1px solid var(--line);border-radius:100px;
-                padding:11px 20px;font-size:16px;color:var(--ink2)}
+                padding:10px 19px;font-size:15.5px;color:var(--ink2);opacity:0}
+      .slide.on .mkt span{animation:pop .5s var(--ease) both}
       .mkt span.first{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 
-      .ask{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:40px}
-      .ask div{border:1px solid var(--accent);background:var(--accent-soft);
-               border-radius:14px;padding:24px 26px}
-      .ask b{display:block;font-family:var(--serif);font-weight:400;font-size:26px}
-      .ask p{font-size:15.5px;color:var(--ink2);margin-top:8px}
+      .quote{font-family:var(--serif);font-size:clamp(22px,3.1vw,38px);line-height:1.25;
+             border-left:4px solid var(--accent);padding-left:24px;margin-top:34px;max-width:27ch}
 
-      .quote{font-family:var(--serif);font-size:clamp(24px,3.4vw,42px);line-height:1.25;
-             color:var(--ink);border-left:4px solid var(--accent);padding-left:26px;margin-top:40px;max-width:26ch}
+      .ask{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:36px}
+      .ask > div{border:1px solid var(--accent);background:var(--accent-soft);
+                 border-radius:14px;padding:23px 25px}
+      .ask b{display:block;font-family:var(--serif);font-weight:400;font-size:25px}
+      .ask p{font-size:15px;color:var(--ink2);margin-top:7px}
 
       /* nav */
-      .nav{position:fixed;bottom:22px;left:0;right:0;display:flex;justify-content:center;
-           gap:8px;z-index:10}
-      .dot{width:30px;height:4px;border-radius:2px;background:#d6d8de;border:none;
-           cursor:pointer;transition:background .2s}
+      .nav{position:fixed;bottom:20px;left:0;right:0;display:flex;justify-content:center;
+           gap:7px;z-index:20}
+      .dot{width:28px;height:4px;border-radius:2px;background:#d6d8de;border:none;
+           cursor:pointer;transition:background .25s}
       .dot.on{background:var(--accent)}
-      .num{position:fixed;bottom:20px;right:26px;font-family:var(--mono);
-           font-size:12px;color:var(--ink3)}
-      .brand{position:fixed;top:26px;left:30px;font-family:var(--serif);font-size:19px;color:var(--ink3)}
+      .num{position:fixed;bottom:18px;right:24px;font-family:var(--mono);
+           font-size:12px;color:var(--ink3);z-index:20}
+      .brand{position:fixed;top:24px;left:28px;font-family:var(--serif);
+             font-size:18px;color:var(--ink3);z-index:20}
 
       @media (max-width:900px){
-        .ba,.pipe,.stats,.ask{grid-template-columns:1fr}
-        .arrow{padding:12px 0}
-        .arrow i{transform:rotate(135deg)}
+        .ba,.pipe,.stats,.ask,.who{grid-template-columns:1fr}
+        .arrow{padding:10px 0}.arrow i{transform:rotate(135deg)}
+        .dots{grid-template-columns:repeat(10,1fr)}
       }
     </style>
   </head>
   <body>
     <div class="brand">ALPHA</div>
 
-    <!-- 1 -->
+    <!-- 1 · HERO -->
     <section class="slide on">
+      <svg class="lattice" id="lat" preserveAspectRatio="none"></svg>
       <div class="inner">
-        <h1>ALPHA</h1>
-        <p class="sub">
+        <h1 class="hero__word" id="heroWord"></h1>
+        <p class="sub r d3" style="font-size:clamp(18px,2.2vw,28px)">
           We predict what a material will do <b>before anyone has made it.</b>
         </p>
-        <p class="tiny">
+        <div class="demo r d4">
+          <span class="demo__in">SiC<i>|</i></span>
+          <span class="demo__arrow">→</span>
+          <span class="demo__out">
+            <span style="animation-delay:1.15s">stiffness</span>
+            <span style="animation-delay:1.28s">hardness</span>
+            <span style="animation-delay:1.41s">weight</span>
+            <span style="animation-delay:1.54s">brittleness</span>
+            <span style="animation-delay:1.67s">impact physics</span>
+          </span>
+        </div>
+        <p class="tiny r d6">
           ASMITA POUDEL · SUWAN ARYAL · PORTER DICKENS<br />
           DIU COMMERCIALIZATION FELLOWSHIP 2026
         </p>
       </div>
     </section>
 
-    <!-- 2 -->
+    <!-- 2 · WHERE WE STARTED -->
     <section class="slide">
       <div class="inner">
-        <p class="step">01 · Where we started</p>
-        <h2>We were asked to find a lighter body armour material.</h2>
-        <p class="sub">
-          Hacking for Defense. A real problem, a real sponsor, a clear ask.
-          So we went looking.
+        <p class="step r d1">01 · Where we started</p>
+        <h2 class="r d2">We were asked to find a lighter body armour material.</h2>
+        <p class="sub r d3">
+          Hacking for Defense. A real sponsor, a real problem, a clear ask. So we went looking.
         </p>
-        <p class="sub">
-          We searched literature. We searched databases. For most candidate
-          compositions, <b>there was simply nothing to find.</b>
+        <p class="sub r d4">
+          We searched literature. We searched databases. For most candidate compositions,
+          <b>there was nothing to find.</b>
         </p>
       </div>
     </section>
 
-    <!-- 3 -->
+    <!-- 3 · THE PIVOT -->
     <section class="slide">
       <div class="inner">
-        <p class="step">02 · What we learned</p>
-        <h2>We were solving the wrong problem.</h2>
-        <p class="sub">
-          Nobody is short of candidate materials. An engineer can list forty in
-          an afternoon. What they cannot do is find out which are worth making.
+        <p class="step r d1">02 · What we learned</p>
+        <h2 class="r d2">We were solving the wrong problem.</h2>
+        <p class="sub r d3">
+          Nobody is short of candidate materials. An engineer lists forty in an afternoon.
+          What they cannot do is find out which are worth making.
         </p>
-        <div class="ba">
+        <div class="ba r d4">
           <div class="ba__side">
             <span class="ba__tag">The original ask</span>
             <h3>Find one material</h3>
@@ -154,110 +232,126 @@
           <div class="ba__side ba__side--now">
             <span class="ba__tag">What we built instead</span>
             <h3>Predict any material</h3>
-            <p>Answers the question for every candidate, in every programme, in one second.</p>
+            <p>Answers it for every candidate, in every programme, in one second.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 4 -->
+    <!-- 4 · THE SOLUTION IN ACTION -->
     <section class="slide">
       <div class="inner">
-        <p class="step">03 · How it works</p>
-        <h2>Physics answers first. The model only corrects it.</h2>
+        <p class="step r d1">03 · What it does</p>
+        <h2 class="r d2">Fifty candidates. Five worth testing.</h2>
+        <div class="funnel">
+          <div class="dots" id="dots"></div>
+          <div class="funnel__cap">
+            <div>
+              <b>50</b>
+              <span>candidates an engineer can name</span>
+            </div>
+            <div>
+              <b class="blue">5</b>
+              <span>the test budget actually covers</span>
+            </div>
+            <div>
+              <b class="blue">1 sec</b>
+              <span>to know which five</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · WHO IT HELPS -->
+    <section class="slide">
+      <div class="inner">
+        <p class="step r d1">04 · Who it helps</p>
+        <h2 class="r d2">Anyone who breaks materials to find out if they work.</h2>
+        <div class="who">
+          <div class="r d3">
+            <h4>Protective equipment</h4>
+            <p>Helmet liners, pads, footwear. Choosing what absorbs an impact without the weight.</p>
+            <em>OUR FIRST MARKET</em>
+          </div>
+          <div class="r d4">
+            <h4>Crash &amp; mobility</h4>
+            <p>Structures that must be stiff, light, and fail in the right way.</p>
+            <em>SAME PHYSICS</em>
+          </div>
+          <div class="r d5">
+            <h4>Tooling &amp; wear</h4>
+            <p>Inserts and dies chosen on the hardness and toughness frontier.</p>
+            <em>SAME ENGINE</em>
+          </div>
+        </div>
+        <p class="sub r d6">
+          Each is a property head on one engine. We proved that on build day by training an
+          entirely new one <b>in part of an afternoon.</b>
+        </p>
+      </div>
+    </section>
+
+    <!-- 6 · HOW IT WORKS -->
+    <section class="slide">
+      <div class="inner">
+        <p class="step r d1">05 · How it works</p>
+        <h2 class="r d2">Physics answers first. The model only corrects it.</h2>
         <div class="pipe">
-          <div>
-            <b>INPUT</b>
-            <h4>A formula</h4>
-            <p>Becomes 132 measurable physical quantities of its elements.</p>
-          </div>
-          <div>
-            <b>PRIOR</b>
-            <h4>A physical law</h4>
-            <p>Stiffness rises with bond strength and packing. The law answers first.</p>
-          </div>
-          <div>
-            <b>LEARNING</b>
-            <h4>A correction</h4>
-            <p>The network learns only the gap, and is penalised for physically impossible behaviour.</p>
-          </div>
-          <div>
-            <b>OUTPUT</b>
-            <h4>Exact equations</h4>
-            <p>Nine of twelve properties come from classical physics, never guessed.</p>
-          </div>
+          <div class="r d3"><b>INPUT</b><h4>A formula</h4>
+            <p>Becomes 132 measurable physical quantities of its elements.</p></div>
+          <div class="r d4"><b>PRIOR</b><h4>A physical law</h4>
+            <p>Stiffness rises with bond strength and packing. The law answers first.</p></div>
+          <div class="r d5"><b>LEARNING</b><h4>A correction</h4>
+            <p>The network learns only the gap, and is penalised for impossible behaviour.</p></div>
+          <div class="r d6"><b>OUTPUT</b><h4>Exact equations</h4>
+            <p>Nine of twelve properties come from classical physics, never guessed.</p></div>
         </div>
-        <p class="sub">
-          This is why it works on <b>twenty samples</b>, which is what a real customer
-          test campaign actually produces.
+        <p class="sub r d6">
+          This is why it works on <b>twenty samples</b> — what a real test campaign produces.
         </p>
       </div>
     </section>
 
-    <!-- 5 -->
+    <!-- 7 · WHERE WE ARE -->
     <section class="slide">
       <div class="inner">
-        <p class="step">04 · Where we are</p>
-        <h2>Live, public, and honest about itself.</h2>
+        <p class="step r d1">06 · Where we are</p>
+        <h2 class="r d2">Live, public, and honest about itself.</h2>
         <div class="stats">
-          <div class="hi">
-            <b>−26%</b>
-            <span>error against data-only learning where data is scarce</span>
-          </div>
-          <div>
-            <b>90–91%</b>
-            <span>verified coverage of our stated confidence range</span>
-          </div>
-          <div>
-            <b>0</b>
-            <span>data a customer must give us to get an answer</span>
-          </div>
+          <div class="hi r d3"><b data-count="-26" data-suffix="%">0</b>
+            <span>error against data-only learning where data is scarce</span></div>
+          <div class="r d4"><b data-count="91" data-suffix="%">0</b>
+            <span>verified coverage of our stated confidence range</span></div>
+          <div class="r d5"><b data-count="0" data-suffix="">0</b>
+            <span>data a customer must give us to get an answer</span></div>
         </div>
-        <p class="sub">
-          Type a material that has never been made and we still answer. Type one we
-          cannot judge, and <b>we refuse.</b>
+        <p class="sub r d6">
+          Type a material that has never been made and we still answer. Type one we cannot
+          judge, and <b>we refuse.</b>
         </p>
-        <p class="tiny">alpha-physics-labs.github.io/alpha-dashboard</p>
+        <p class="tiny r d6">alpha-physics-labs.github.io/alpha-dashboard</p>
       </div>
     </section>
 
-    <!-- 6 -->
+    <!-- 8 · THE ASK -->
     <section class="slide">
       <div class="inner">
-        <p class="step">05 · Where this goes</p>
-        <h2>One engine. A property head per market.</h2>
-        <div class="mkt">
-          <span class="first">Sports &amp; impact protection</span>
-          <span>Crash &amp; EV safety</span>
-          <span>Aerospace</span>
-          <span>Industrial tooling</span>
-          <span>Semiconductors</span>
-          <span>Defence</span>
-        </div>
-        <p class="sub">
-          We proved this on build day: we trained an entirely new property head, for a
-          different market, <b>in part of one afternoon.</b>
-        </p>
-        <p class="quote">Physics gets us to the cold start. Customer data becomes the moat.</p>
-      </div>
-    </section>
-
-    <!-- 7 -->
-    <section class="slide">
-      <div class="inner">
-        <p class="step">06 · What we need</p>
-        <h2>The technology is ahead of the proof that anyone will pay.</h2>
-        <p class="sub">That is the honest gap, and it is the one we came here to close.</p>
-        <div class="ask">
+        <p class="step r d1">07 · What we need</p>
+        <h2 class="r d2">The technology is ahead of the proof that anyone will pay.</h2>
+        <p class="sub r d3">That is the honest gap, and the one we came here to close.</p>
+        <div class="ask r d4">
           <div>
             <b>An introduction</b>
-            <p>To anyone who tests materials for a living. Our first question is what a full evaluation cycle actually costs them.</p>
+            <p>To anyone who tests materials for a living. First question: what does a full
+            evaluation cycle actually cost you?</p>
           </div>
           <div>
             <b>One partner, twenty tests</b>
             <p>Twenty impact tests turns our engine into a model no competitor can replicate.</p>
           </div>
         </div>
+        <p class="quote r d6">Physics gets us to the cold start. Customer data becomes the moat.</p>
       </div>
     </section>
 
@@ -265,6 +359,44 @@
     <div class="num" id="num"></div>
 
     <script>
+      /* hero title, letter by letter */
+      const word = 'ALPHA';
+      document.getElementById('heroWord').innerHTML = [...word]
+        .map((c, k) => `<span style="animation-delay:${0.12 + k * 0.075}s">${c}</span>`)
+        .join('');
+
+      /* hero lattice: atoms on a grid with bonds */
+      (function lattice() {
+        const svg = document.getElementById('lat');
+        const W = 1600, H = 900, step = 118;
+        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+        const pts = [];
+        for (let y = step / 2; y < H; y += step)
+          for (let x = step / 2; x < W; x += step)
+            pts.push([x + (Math.random() - .5) * 26, y + (Math.random() - .5) * 26]);
+        let s = '';
+        pts.forEach(([x, y], i) => {
+          pts.slice(i + 1).forEach(([x2, y2]) => {
+            const d = Math.hypot(x - x2, y - y2);
+            if (d < step * 1.15)
+              s += `<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" style="animation-delay:${.5 + d / 900}s"/>`;
+          });
+        });
+        pts.forEach(([x, y], i) => {
+          s += `<circle cx="${x}" cy="${y}" r="${3.2 + (i % 3)}" style="animation-delay:${.2 + (x + y) / 3400}s,${2 + (i % 7) * .3}s"/>`;
+        });
+        svg.innerHTML = s;
+      })();
+
+      /* the 50 → 5 funnel */
+      (function funnel() {
+        const keep = new Set([7, 14, 23, 31, 42]);
+        document.getElementById('dots').innerHTML = Array.from({ length: 50 }, (_, k) =>
+          `<i class="${keep.has(k) ? 'keep' : 'drop'}" style="animation-delay:${k * 0.028}s,1.9s"></i>`
+        ).join('');
+      })();
+
+      /* slide machinery */
       const slides = [...document.querySelectorAll('.slide')];
       const nav = document.getElementById('nav');
       const num = document.getElementById('num');
@@ -273,15 +405,35 @@
       slides.forEach((_, n) => {
         const b = document.createElement('button');
         b.className = 'dot' + (n === 0 ? ' on' : '');
-        b.onclick = () => go(n);
+        b.onclick = (e) => { e.stopPropagation(); go(n); };
         nav.appendChild(b);
       });
 
+      function countUp(el) {
+        const target = Number(el.dataset.count);
+        const suffix = el.dataset.suffix || '';
+        const dur = 900, t0 = performance.now();
+        const tick = (t) => {
+          const p = Math.min(1, (t - t0) / dur);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(target * eased) + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+
       function go(n) {
         i = Math.max(0, Math.min(slides.length - 1, n));
-        slides.forEach((s, k) => s.classList.toggle('on', k === i));
+        slides.forEach((s, k) => {
+          s.classList.toggle('on', k === i);
+          if (k === i) { void s.offsetWidth; }   // restart the entrance animations
+        });
         [...nav.children].forEach((d, k) => d.classList.toggle('on', k === i));
         num.textContent = (i + 1) + ' / ' + slides.length;
+        slides[i].querySelectorAll('[data-count]').forEach((el) => {
+          el.textContent = '0';
+          setTimeout(() => countUp(el), 380);
+        });
       }
 
       addEventListener('keydown', (e) => {
