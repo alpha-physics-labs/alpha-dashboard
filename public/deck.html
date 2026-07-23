@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ALPHA — Our journey</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Basic&family=Noto+Serif+Display:ital,wght@0,400..600;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      :root{
+        --ink:#14161b;--ink2:#4e535d;--ink3:#8b909a;--line:#e5e6ea;--bg:#f6f6f8;
+        --accent:#0a63d8;--accent-soft:#e9f1fd;--good:#1d8a57;--warn:#b25e0b;
+        --sans:"Basic",system-ui,sans-serif;
+        --serif:"Noto Serif Display",Georgia,serif;
+        --mono:"Spline Sans Mono",monospace;
+      }
+      html,body{height:100%}
+      body{font-family:var(--sans);color:var(--ink);background:var(--bg);overflow:hidden}
+
+      .slide{
+        position:fixed;inset:0;display:none;
+        padding:clamp(40px,6vw,90px);
+        flex-direction:column;justify-content:center;
+      }
+      .slide.on{display:flex;animation:in .5s cubic-bezier(.22,1,.36,1) both}
+      @keyframes in{from{opacity:0;transform:translateY(14px)}}
+      .inner{max-width:1100px;margin:0 auto;width:100%}
+
+      .step{font-family:var(--mono);font-size:13px;letter-spacing:.14em;
+            color:var(--accent);text-transform:uppercase;margin-bottom:22px}
+      h1{font-family:var(--serif);font-weight:400;font-size:clamp(52px,9vw,120px);
+         line-height:.98;letter-spacing:.005em}
+      h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5.4vw,68px);
+         line-height:1.06;letter-spacing:.005em;max-width:19ch}
+      .sub{font-size:clamp(17px,2vw,25px);color:var(--ink2);margin-top:24px;max-width:52ch;line-height:1.45}
+      .sub b{color:var(--ink);font-weight:400}
+      .tiny{font-family:var(--mono);font-size:13px;color:var(--ink3);margin-top:34px;letter-spacing:.03em}
+
+      /* before / after */
+      .ba{display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;margin-top:46px;gap:0}
+      .ba__side{padding:26px 30px;border-radius:14px;background:#fff;border:1px solid var(--line)}
+      .ba__side--now{border-color:rgba(10,99,216,.35);
+                     background:linear-gradient(160deg,var(--accent-soft),#fff 60%)}
+      .ba__tag{font-family:var(--mono);font-size:12px;letter-spacing:.1em;
+               text-transform:uppercase;color:var(--ink3)}
+      .ba__side--now .ba__tag{color:var(--accent)}
+      .ba__side h3{font-family:var(--serif);font-weight:400;font-size:clamp(21px,2.5vw,30px);
+                   margin-top:10px;line-height:1.2}
+      .ba__side p{font-size:15.5px;color:var(--ink2);margin-top:10px}
+      .arrow{display:grid;place-items:center}
+      .arrow i{width:22px;height:22px;border-top:2px solid var(--accent);
+               border-right:2px solid var(--accent);transform:rotate(45deg)}
+
+      /* pipeline */
+      .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:44px}
+      .pipe div{background:#fff;border:1px solid var(--line);border-radius:13px;padding:20px 22px}
+      .pipe b{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.08em}
+      .pipe h4{font-size:17px;font-weight:600;margin-top:9px}
+      .pipe p{font-size:14px;color:var(--ink2);margin-top:6px;line-height:1.45}
+
+      /* stats */
+      .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:44px}
+      .stats div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px 26px 22px}
+      .stats b{display:block;font-family:var(--serif);font-weight:400;
+               font-size:clamp(38px,5vw,58px);line-height:1}
+      .stats span{display:block;font-size:14.5px;color:var(--ink2);margin-top:10px;line-height:1.4}
+      .stats .hi{background:var(--accent);border-color:var(--accent)}
+      .stats .hi b{color:#fff}
+      .stats .hi span{color:#fff;opacity:.92}
+
+      /* market row */
+      .mkt{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px}
+      .mkt span{background:#fff;border:1px solid var(--line);border-radius:100px;
+                padding:11px 20px;font-size:16px;color:var(--ink2)}
+      .mkt span.first{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+      .ask{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:40px}
+      .ask div{border:1px solid var(--accent);background:var(--accent-soft);
+               border-radius:14px;padding:24px 26px}
+      .ask b{display:block;font-family:var(--serif);font-weight:400;font-size:26px}
+      .ask p{font-size:15.5px;color:var(--ink2);margin-top:8px}
+
+      .quote{font-family:var(--serif);font-size:clamp(24px,3.4vw,42px);line-height:1.25;
+             color:var(--ink);border-left:4px solid var(--accent);padding-left:26px;margin-top:40px;max-width:26ch}
+
+      /* nav */
+      .nav{position:fixed;bottom:22px;left:0;right:0;display:flex;justify-content:center;
+           gap:8px;z-index:10}
+      .dot{width:30px;height:4px;border-radius:2px;background:#d6d8de;border:none;
+           cursor:pointer;transition:background .2s}
+      .dot.on{background:var(--accent)}
+      .num{position:fixed;bottom:20px;right:26px;font-family:var(--mono);
+           font-size:12px;color:var(--ink3)}
+      .brand{position:fixed;top:26px;left:30px;font-family:var(--serif);font-size:19px;color:var(--ink3)}
+
+      @media (max-width:900px){
+        .ba,.pipe,.stats,.ask{grid-template-columns:1fr}
+        .arrow{padding:12px 0}
+        .arrow i{transform:rotate(135deg)}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="brand">ALPHA</div>
+
+    <!-- 1 -->
+    <section class="slide on">
+      <div class="inner">
+        <h1>ALPHA</h1>
+        <p class="sub">
+          We predict what a material will do <b>before anyone has made it.</b>
+        </p>
+        <p class="tiny">
+          ASMITA POUDEL · SUWAN ARYAL · PORTER DICKENS<br />
+          DIU COMMERCIALIZATION FELLOWSHIP 2026
+        </p>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide">
+      <div class="inner">
+        <p class="step">01 · Where we started</p>
+        <h2>We were asked to find a lighter body armour material.</h2>
+        <p class="sub">
+          Hacking for Defense. A real problem, a real sponsor, a clear ask.
+          So we went looking.
+        </p>
+        <p class="sub">
+          We searched literature. We searched databases. For most candidate
+          compositions, <b>there was simply nothing to find.</b>
+        </p>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="slide">
+      <div class="inner">
+        <p class="step">02 · What we learned</p>
+        <h2>We were solving the wrong problem.</h2>
+        <p class="sub">
+          Nobody is short of candidate materials. An engineer can list forty in
+          an afternoon. What they cannot do is find out which are worth making.
+        </p>
+        <div class="ba">
+          <div class="ba__side">
+            <span class="ba__tag">The original ask</span>
+            <h3>Find one material</h3>
+            <p>Answers one question, once. Then the next programme asks again.</p>
+          </div>
+          <div class="arrow"><i></i></div>
+          <div class="ba__side ba__side--now">
+            <span class="ba__tag">What we built instead</span>
+            <h3>Predict any material</h3>
+            <p>Answers the question for every candidate, in every programme, in one second.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide">
+      <div class="inner">
+        <p class="step">03 · How it works</p>
+        <h2>Physics answers first. The model only corrects it.</h2>
+        <div class="pipe">
+          <div>
+            <b>INPUT</b>
+            <h4>A formula</h4>
+            <p>Becomes 132 measurable physical quantities of its elements.</p>
+          </div>
+          <div>
+            <b>PRIOR</b>
+            <h4>A physical law</h4>
+            <p>Stiffness rises with bond strength and packing. The law answers first.</p>
+          </div>
+          <div>
+            <b>LEARNING</b>
+            <h4>A correction</h4>
+            <p>The network learns only the gap, and is penalised for physically impossible behaviour.</p>
+          </div>
+          <div>
+            <b>OUTPUT</b>
+            <h4>Exact equations</h4>
+            <p>Nine of twelve properties come from classical physics, never guessed.</p>
+          </div>
+        </div>
+        <p class="sub">
+          This is why it works on <b>twenty samples</b>, which is what a real customer
+          test campaign actually produces.
+        </p>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide">
+      <div class="inner">
+        <p class="step">04 · Where we are</p>
+        <h2>Live, public, and honest about itself.</h2>
+        <div class="stats">
+          <div class="hi">
+            <b>−26%</b>
+            <span>error against data-only learning where data is scarce</span>
+          </div>
+          <div>
+            <b>90–91%</b>
+            <span>verified coverage of our stated confidence range</span>
+          </div>
+          <div>
+            <b>0</b>
+            <span>data a customer must give us to get an answer</span>
+          </div>
+        </div>
+        <p class="sub">
+          Type a material that has never been made and we still answer. Type one we
+          cannot judge, and <b>we refuse.</b>
+        </p>
+        <p class="tiny">alpha-physics-labs.github.io/alpha-dashboard</p>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="slide">
+      <div class="inner">
+        <p class="step">05 · Where this goes</p>
+        <h2>One engine. A property head per market.</h2>
+        <div class="mkt">
+          <span class="first">Sports &amp; impact protection</span>
+          <span>Crash &amp; EV safety</span>
+          <span>Aerospace</span>
+          <span>Industrial tooling</span>
+          <span>Semiconductors</span>
+          <span>Defence</span>
+        </div>
+        <p class="sub">
+          We proved this on build day: we trained an entirely new property head, for a
+          different market, <b>in part of one afternoon.</b>
+        </p>
+        <p class="quote">Physics gets us to the cold start. Customer data becomes the moat.</p>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="slide">
+      <div class="inner">
+        <p class="step">06 · What we need</p>
+        <h2>The technology is ahead of the proof that anyone will pay.</h2>
+        <p class="sub">That is the honest gap, and it is the one we came here to close.</p>
+        <div class="ask">
+          <div>
+            <b>An introduction</b>
+            <p>To anyone who tests materials for a living. Our first question is what a full evaluation cycle actually costs them.</p>
+          </div>
+          <div>
+            <b>One partner, twenty tests</b>
+            <p>Twenty impact tests turns our engine into a model no competitor can replicate.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="nav" id="nav"></div>
+    <div class="num" id="num"></div>
+
+    <script>
+      const slides = [...document.querySelectorAll('.slide')];
+      const nav = document.getElementById('nav');
+      const num = document.getElementById('num');
+      let i = 0;
+
+      slides.forEach((_, n) => {
+        const b = document.createElement('button');
+        b.className = 'dot' + (n === 0 ? ' on' : '');
+        b.onclick = () => go(n);
+        nav.appendChild(b);
+      });
+
+      function go(n) {
+        i = Math.max(0, Math.min(slides.length - 1, n));
+        slides.forEach((s, k) => s.classList.toggle('on', k === i));
+        [...nav.children].forEach((d, k) => d.classList.toggle('on', k === i));
+        num.textContent = (i + 1) + ' / ' + slides.length;
+      }
+
+      addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); go(i + 1); }
+        if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); go(i - 1); }
+        if (e.key === 'Home') go(0);
+        if (e.key === 'End') go(slides.length - 1);
+      });
+      addEventListener('click', (e) => { if (!e.target.closest('.dot')) go(i + 1); });
+      go(0);
+    </script>
+  </body>
+</html>
