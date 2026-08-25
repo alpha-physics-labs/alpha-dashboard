@@ -2386,3 +2386,534 @@ button {
     gap: 4px;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Impact workspace: the second engine. Same tokens as the console so the two
+   tabs read as one product, with its own class namespace so nothing collides
+   with the 2,000 lines above.
+   -------------------------------------------------------------------------- */
+
+.imp {
+  --imp-bad: #b03a2e;
+  --imp-bad-soft: #fbeeec;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 34px 24px 90px;
+}
+
+.imp__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 28px;
+}
+@media (min-width: 940px) {
+  .imp__head {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 48px;
+    align-items: start;
+  }
+}
+.imp__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 12px;
+}
+.imp__head h1 {
+  font-size: clamp(25px, 3.2vw, 34px);
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+  font-weight: 400;
+  max-width: 20ch;
+  margin-bottom: 12px;
+}
+.imp__sub {
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 62ch;
+}
+
+.imp__val {
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  padding: 16px 18px;
+}
+.imp__vlbl {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 12px;
+}
+.imp__vrow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.imp__vrow:last-child {
+  margin-bottom: 0;
+}
+.imp__vrow b {
+  font-family: var(--font-mono);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 64px;
+}
+.imp__vrow span {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+.imp__vrow--dim b,
+.imp__vrow--dim span {
+  color: var(--ink-3);
+}
+
+.imp__grid2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 26px;
+}
+@media (min-width: 940px) {
+  .imp__grid2 {
+    grid-template-columns: 322px minmax(0, 1fr);
+    gap: 34px;
+    align-items: start;
+  }
+}
+
+/* controls */
+
+.imp__panel {
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  padding: 20px 20px 24px;
+  box-shadow: var(--shadow);
+}
+.imp__ptitle {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+  margin: 0 0 14px;
+}
+.imp__field + .imp__ptitle {
+  margin-top: 26px;
+}
+
+.imp__grades {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 22px;
+}
+.imp__grade {
+  border: 1px solid var(--line);
+  border-radius: var(--r-el);
+  background: var(--bg);
+  padding: 9px 6px;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  transition:
+    border-color 0.18s var(--ease),
+    background 0.18s var(--ease);
+}
+.imp__grade:hover {
+  border-color: var(--accent);
+}
+.imp__grade.is-on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.imp__grade b {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.imp__grade span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-2);
+  margin-top: 2px;
+}
+.imp__grade i {
+  display: block;
+  font-style: normal;
+  font-size: 9.5px;
+  color: var(--ink-3);
+  margin-top: 3px;
+}
+.imp__grade.is-on b,
+.imp__grade.is-on span {
+  color: var(--accent);
+}
+
+.imp__field {
+  display: block;
+  margin-bottom: 18px;
+}
+.imp__flbl {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 7px;
+}
+.imp__num {
+  margin-left: auto;
+  width: 74px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: right;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+}
+.imp__num:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+.imp__flbl i {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  width: 34px;
+}
+.imp__range {
+  width: 100%;
+  accent-color: var(--accent);
+  height: 20px;
+  cursor: pointer;
+}
+.imp__hint {
+  display: block;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-3);
+  margin-top: 5px;
+}
+
+.imp__toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-bottom: 18px;
+}
+.imp__toggle button {
+  border: 1px solid var(--line);
+  border-radius: var(--r-el);
+  background: var(--bg);
+  padding: 8px 6px;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.imp__toggle button.is-on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* results */
+
+.imp__out {
+  min-width: 0;
+}
+
+.imp__result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+  transition: opacity 0.2s var(--ease);
+}
+.imp__result.is-busy {
+  opacity: 0.55;
+}
+.imp__plbl {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+.imp__peak b {
+  font-family: var(--font-mono);
+  font-size: 46px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.imp__peak b i {
+  font-style: normal;
+  font-size: 20px;
+  color: var(--ink-3);
+  margin-left: 5px;
+}
+.imp__prange {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin-top: 7px;
+}
+.imp__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+.imp__flag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.imp__flag--ok {
+  color: var(--good);
+  border-color: var(--good);
+  background: var(--good-soft);
+}
+.imp__flag--warn {
+  color: var(--warn);
+  border-color: var(--warn);
+  background: var(--warn-soft);
+}
+.imp__flag--bad {
+  color: var(--imp-bad);
+  border-color: var(--imp-bad);
+  background: var(--imp-bad-soft);
+}
+.imp__flag--plain {
+  color: var(--ink-3);
+  border-color: var(--line);
+  background: var(--bg);
+}
+
+.imp__warn {
+  border: 1px solid var(--warn);
+  border-left-width: 3px;
+  border-radius: var(--r-el);
+  background: var(--warn-soft);
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+.imp__warn--bad {
+  border-color: var(--imp-bad);
+  background: var(--imp-bad-soft);
+}
+.imp__warn b {
+  display: block;
+  font-size: 13.5px;
+  margin-bottom: 7px;
+}
+.imp__warn p {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 66ch;
+}
+.imp__warn ul {
+  margin: 0 0 8px 18px;
+}
+.imp__warn li {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin-bottom: 3px;
+}
+
+.imp__err {
+  border: 1px solid var(--imp-bad);
+  border-left-width: 3px;
+  border-radius: var(--r-el);
+  background: var(--imp-bad-soft);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.imp__err b {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.imp__err p {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+
+.imp__wait {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  padding: 26px 24px;
+}
+.imp__wait p {
+  font-size: 14px;
+  color: var(--ink-2);
+  max-width: 52ch;
+}
+.imp__spin {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  animation: imp-spin 0.8s linear infinite;
+  flex: none;
+}
+@keyframes imp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .imp__spin {
+    animation: none;
+  }
+}
+
+.imp__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  padding: 6px;
+  box-shadow: var(--shadow);
+}
+.imp__grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.imp__axis {
+  stroke: var(--ink-3);
+  stroke-width: 1;
+}
+.imp__tick {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--ink-3);
+}
+.imp__axtitle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--ink-3);
+  letter-spacing: 0.08em;
+}
+.imp__fill {
+  fill: var(--accent);
+  opacity: 0.09;
+}
+.imp__line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+}
+.imp__band {
+  fill: var(--accent);
+  opacity: 0.07;
+}
+.imp__peakline {
+  stroke: var(--ink-3);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.imp__peakdot {
+  fill: var(--accent);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+.imp__peaklabel {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.imp__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  margin-top: 16px;
+}
+.imp__stats > div {
+  background: var(--surface);
+  padding: 14px 16px;
+}
+.imp__slbl {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+.imp__stats b {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.imp__snote {
+  display: block;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--ink-3);
+  margin-top: 5px;
+}
+
+.imp__foot {
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.55;
+  margin-top: 16px;
+  max-width: 74ch;
+}
