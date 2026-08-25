@@ -136,6 +136,11 @@ export async function simulateImpact(req: ImpactRequest): Promise<ImpactResult> 
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) {
+    if (res.status === 404) {
+      throw new Error(
+        "The impact engine is not on this API build yet. It ships with the next deploy of alpha-core.",
+      );
+    }
     // The engine refuses impossible pads on purpose; show its reason, not a code.
     const detail = data?.detail;
     const msg =
