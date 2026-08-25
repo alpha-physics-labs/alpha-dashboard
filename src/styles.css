@@ -2917,3 +2917,181 @@ button {
   margin-top: 16px;
   max-width: 74ch;
 }
+
+/* --------------------------------------------------------------------------
+   The trained structure heads, inside the Roadmap view. Everything else on
+   that page is a plan; this one section is a measured result, so it gets a
+   surface and a border while the plans stay flat.
+   -------------------------------------------------------------------------- */
+
+.gnn {
+  max-width: 1080px;
+  margin: 0 auto 64px;
+  padding: 28px 30px 30px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.gnn__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 14px 24px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 24px;
+}
+.gnn__tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--amber);
+  border: 1px solid var(--amber);
+  background: var(--warn-soft);
+  border-radius: 999px;
+  padding: 3px 9px;
+  margin-bottom: 12px;
+}
+.gnn__title {
+  font-size: clamp(20px, 2.6vw, 26px);
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+.gnn__lede {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 66ch;
+}
+.gnn__evidence {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.gnn__heads {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 26px;
+}
+@media (min-width: 720px) {
+  .gnn__heads {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.gnn__card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-el);
+  background: var(--bg);
+  padding: 18px 20px 16px;
+}
+.gnn__card h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.gnn__set {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-bottom: 16px;
+}
+.gnn__big {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 0;
+  margin-bottom: 14px;
+}
+.gnn__big b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+}
+.gnn__big span {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  margin-top: 8px;
+  max-width: 34ch;
+}
+.gnn__kv {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+}
+.gnn__kv div {
+  min-width: 0;
+}
+.gnn__kv dt {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 3px;
+}
+.gnn__kv dd {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.gnn__caveat {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--warn);
+  border-top: 1px solid var(--line);
+  margin-top: 14px;
+  padding-top: 12px;
+}
+
+.gnn__why {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px 28px;
+}
+@media (min-width: 860px) {
+  .gnn__why {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.gnn__why h4 {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.gnn__why ul {
+  margin: 0;
+  padding-left: 17px;
+}
+.gnn__why li {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin-bottom: 7px;
+}
+.gnn__why li::marker {
+  color: var(--ink-3);
+}

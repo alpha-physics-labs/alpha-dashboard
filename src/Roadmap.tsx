@@ -1,5 +1,12 @@
 /* Roadmap view. Deliberately simple. Nothing here is presented as a current
-   capability — each card says plainly what it needs before it can exist. */
+   capability, and each card says plainly what it needs before it can exist.
+
+   One exception, and it is real: the structure model below is trained. Its
+   numbers are fetched live from the API rather than typed into this file, so
+   they cannot drift away from what was actually measured. */
+
+import { useEffect, useState } from "react";
+import { fetchGnnCard, type GnnCard } from "./api";
 
 export default function Roadmap() {
   return (
@@ -8,7 +15,8 @@ export default function Roadmap() {
         <p className="roadmap__eyebrow">Roadmap</p>
         <h1>Today we read the chemistry. Next we read the structure.</h1>
         <p>
-          Nothing on this page is built yet. Each card says what it would take.
+          The structure model is trained already, and its measured results are below.
+          Everything after that is not built, and each card says what it would take.
         </p>
       </header>
 
@@ -37,11 +45,13 @@ export default function Roadmap() {
             apart, how tightly packed. Geometry carries information chemistry alone cannot.
           </p>
           <p className="leap__why">
-            We already hold <b>10,987 crystal structures</b> whose 3D arrangement we currently
-            throw away, keeping only the formula. The training data is sitting on the laptop.
+            Both heads are trained, on <b>10,987 crystal structures</b> whose 3D arrangement the
+            composition engine currently throws away. What is missing is somewhere to run them.
           </p>
         </div>
       </section>
+
+      <TrainedGnn />
 
       {/* what it unlocks */}
       <section className="unlock">
@@ -135,5 +145,72 @@ export default function Roadmap() {
         </p>
       </section>
     </div>
+  );
+}
+
+
+/* The trained structure heads, read from the API so the page can never claim a
+   number the engine did not actually report. Everything the model card says
+   about why it is not served, and why it is not comparable, is shown too. */
+
+function TrainedGnn() {
+  const [card, setCard] = useState<GnnCard | null>(null);
+  const [tried, setTried] = useState(false);
+
+  useEffect(() => {
+    fetchGnnCard()
+      .then(setCard)
+      .finally(() => setTried(true));
+  }, []);
+
+  if (!tried) return null;
+  if (!card || card.heads.length === 0) return null;
+
+  return (
+    <section className="gnn">
+      <div className="gnn__head">
+        <div>
+          <span className="gnn__tag">Trained, not served</span>
+          <h3 className="gnn__title">What the structure model already scores</h3>
+          <p className="gnn__lede">{card.why_it_matters}</p>
+        </div>
+        <span className="gnn__evidence">{card.evidence_status.replace("_", " ").toLowerCase()}</span>
+      </div>
+
+      <div className="gnn__heads">
+        {card.heads.map((h) => (
+          <article key={h.target} className="gnn__card">
+            <h4>{h.target === "shear" ? "Shear modulus" : "Bulk modulus"}</h4>
+            <p className="gnn__set">{h.dataset}</p>
+            <div className="gnn__big">
+              <b>{h.typical_factor ? `${h.typical_factor.toFixed(2)}x` : "not reported"}</b>
+              <span>typical prediction lands within this factor of the truth</span>
+            </div>
+            <dl className="gnn__kv">
+              <div><dt>Test MAE</dt><dd>{h.test_mae_log10} log10</dd></div>
+              <div><dt>Structures</dt><dd>{h.n_structures?.toLocaleString()}</dd></div>
+              <div><dt>Epochs</dt><dd>{h.epochs}</dd></div>
+              <div><dt>Trained in</dt><dd>{h.train_minutes} min</dd></div>
+            </dl>
+            {h.own_evaluation && <p className="gnn__caveat">{h.own_evaluation}</p>}
+          </article>
+        ))}
+      </div>
+
+      <div className="gnn__why">
+        <div>
+          <h4>Why it is not in the product</h4>
+          <ul>{card.not_served_because.map((r) => <li key={r}>{r}</li>)}</ul>
+        </div>
+        <div>
+          <h4>Why you cannot compare it to the console</h4>
+          <ul>{card.not_comparable_because.map((r) => <li key={r}>{r}</li>)}</ul>
+        </div>
+        <div>
+          <h4>Before we publish a comparison</h4>
+          <ul>{card.before_we_publish_a_comparison.map((r) => <li key={r}>{r}</li>)}</ul>
+        </div>
+      </div>
+    </section>
   );
 }

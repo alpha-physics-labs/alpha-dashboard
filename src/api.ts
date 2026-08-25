@@ -153,3 +153,44 @@ export async function simulateImpact(req: ImpactRequest): Promise<ImpactResult> 
   }
   return data as ImpactResult;
 }
+
+/* ── structure GNN: trained, not served ────────────────────────────────── */
+
+export type GnnHead = {
+  target: string;
+  predicts: string;
+  dataset?: string;
+  n_structures?: number;
+  epochs?: number;
+  cutoff_angstrom?: number;
+  train_minutes?: number;
+  device?: string;
+  trained_utc?: string;
+  git_sha?: string;
+  test_mae_log10?: number;
+  test_rmse_log10?: number;
+  typical_factor?: number;
+  typical_error_pct?: number;
+  own_evaluation?: string;
+};
+
+export type GnnCard = {
+  engine: string;
+  status: string;
+  kind: string;
+  why_it_matters: string;
+  heads: GnnHead[];
+  not_served_because: string[];
+  not_comparable_because: string[];
+  before_we_publish_a_comparison: string[];
+  evidence_status: string;
+};
+
+export async function fetchGnnCard(): Promise<GnnCard | null> {
+  try {
+    const res = await fetch(`${API_BASE}/v1/gnn/model`);
+    return res.ok ? ((await res.json()) as GnnCard) : null;
+  } catch {
+    return null;
+  }
+}
