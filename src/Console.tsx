@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Roadmap from "./Roadmap";
+import Impact from "./Impact";
 import {
   API_BASE,
   checkHealth,
@@ -636,7 +637,7 @@ export default function Console() {
   const [known, setKnown] = useState<Record<string, KnownState>>({});
   const [status, setStatus] = useState<"checking" | "online" | "offline">("checking");
   const [card, setCard] = useState<ModelCard | null>(null);
-  const [tab, setTab] = useState<"console" | "roadmap">("console");
+  const [tab, setTab] = useState<"console" | "impact" | "roadmap">("console");
 
   useEffect(() => {
     let stopped = false;
@@ -766,6 +767,12 @@ export default function Console() {
               Console
             </button>
             <button
+              className={tab === "impact" ? "bar__tab is-on" : "bar__tab"}
+              onClick={() => setTab("impact")}
+            >
+              Impact
+            </button>
+            <button
               className={tab === "roadmap" ? "bar__tab is-on" : "bar__tab"}
               onClick={() => setTab("roadmap")}
             >
@@ -783,6 +790,7 @@ export default function Console() {
         </div>
       </header>
 
+      {tab === "impact" && <Impact />}
       {tab === "roadmap" && <Roadmap />}
 
       <div className="work" hidden={tab !== "console"}>
